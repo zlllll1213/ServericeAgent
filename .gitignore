@@ -13,3 +13,10 @@ venv/
 # Tooling caches
 .mypy_cache/
 .ruff_cache/
+
+# Local agent and reasoning-tool configuration
+.codegraph/
+AGENTS.md
+Agent.md
+agent.md
+reasonix.toml
