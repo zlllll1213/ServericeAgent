@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ServiceFlow Agent Demo</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="product-mark">ServiceFlow Agent Demo</p>
+          <h1>企业知识库智能客服 Agent</h1>
+        </div>
+        <div class="status-chip" aria-label="系统状态">
+          <span class="status-dot"></span>
+          本地演示环境
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="客服 Agent 演示工作台">
+        <section class="chat-panel" aria-label="聊天窗口">
+          <div id="messages" class="messages" aria-live="polite">
+            <article class="message assistant">
+              <p>你好，我可以查询订单、申请退货、回答技术和售后政策问题，也可以在投诉场景创建人工工单。</p>
+            </article>
+          </div>
+
+          <div class="prompt-row" aria-label="测试问题">
+            <button type="button" data-prompt="帮我查一下订单 10001 到哪里了">查订单 10001</button>
+            <button type="button" data-prompt="我要退货，订单号 10001">退货 10001</button>
+            <button type="button" data-prompt="路由器怎么连接 WiFi">连接 WiFi</button>
+            <button type="button" data-prompt="7 天无理由退货规则是什么">7 天退货规则</button>
+            <button type="button" data-prompt="SmartRouter X1 支持 macOS 吗">macOS 支持</button>
+            <button type="button" data-prompt="我要投诉，转人工客服">投诉转人工</button>
+          </div>
+
+          <form id="chat-form" class="composer">
+            <label class="sr-only" for="message-input">输入客服问题</label>
+            <textarea id="message-input" name="message" rows="2" placeholder="输入问题，例如：我要退货，订单号 10001"></textarea>
+            <button type="submit">发送问题</button>
+          </form>
+          <p id="error-text" class="error-text" role="status"></p>
+        </section>
+
+        <aside class="debug-panel" aria-label="Agent 调试面板">
+          <div class="debug-header">
+            <div>
+              <p class="panel-kicker">Agent Evidence</p>
+              <h2>路由与工具调用</h2>
+            </div>
+            <button type="button" id="clear-debug">清空</button>
+          </div>
+
+          <dl class="metrics">
+            <div>
+              <dt>Intent</dt>
+              <dd id="intent">UNKNOWN</dd>
+            </div>
+            <div>
+              <dt>Confidence</dt>
+              <dd id="confidence">0.00</dd>
+            </div>
+            <div>
+              <dt>Ticket</dt>
+              <dd id="ticket">None</dd>
+            </div>
+          </dl>
+
+          <section class="trace-card">
+            <h3>Route Trace</h3>
+            <ol id="route-trace" class="trace-list"></ol>
+          </section>
+
+          <section class="trace-card">
+            <h3>Tool Calls</h3>
+            <pre id="tool-calls">[]</pre>
+          </section>
+
+          <section class="trace-card">
+            <h3>Retrieved Docs</h3>
+            <pre id="retrieved-docs">[]</pre>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
