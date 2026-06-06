@@ -1,4 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
+from app.llm.client import get_llm_client
+from app.llm.prompts import INTENT_RECOGNITION_PROMPT
 
 
 @dataclass(frozen=True)
@@ -6,6 +10,7 @@ class IntentResult:
     intent: str
     confidence: float
     reason: str
+    slots: dict[str, Any] = field(default_factory=dict)
 
 
 INTENT_KEYWORDS = {
@@ -61,3 +66,65 @@ def classify_intent(message: str) -> IntentResult:
 
     confidence = min(0.95, 0.72 + best_score * 0.08)
     return IntentResult(best_intent, confidence, f"命中 {best_intent} 相关关键词 {best_score} 个")
+
+
+def classify_intent_hybrid(message: str) -> tuple[IntentResult, dict[str, Any]]:
+    rule_result = classify_intent(message)
+    llm_result = classify_intent_with_llm(message)
+    route_debug: dict[str, Any] = {
+        "rule_result": asdict(rule_result),
+        "llm_result": asdict(llm_result) if llm_result else None,
+        "final_intent": rule_result.intent,
+        "conflict": False,
+        "decision_reason": "LLM 不可用或未配置 API Key，使用规则路由。",
+    }
+
+    if llm_result is None:
+        return rule_result, route_debug
+
+    conflict = rule_result.intent != llm_result.intent
+    route_debug["conflict"] = conflict
+
+    if not conflict:
+        confidence = min(0.99, max(rule_result.confidence, llm_result.confidence) + 0.05)
+        final = IntentResult(
+            intent=rule_result.intent,
+            confidence=confidence,
+            reason=f"规则和 LLM 结果一致：{rule_result.reason}",
+            slots={**rule_result.slots, **llm_result.slots},
+        )
+        route_debug["final_intent"] = final.intent
+        route_debug["decision_reason"] = "规则路由和 LLM 路由一致，提高置信度。"
+        return final, route_debug
+
+    # 冲突时优先选择高置信度结果；两个高置信度且差距不大时交给 clarify_node。
+    if min(rule_result.confidence, llm_result.confidence) >= 0.7 and abs(rule_result.confidence - llm_result.confidence) < 0.12:
+        final = IntentResult("UNKNOWN", 0.42, "规则和 LLM 对用户意图判断冲突，需要追问确认")
+        route_debug["final_intent"] = final.intent
+        route_debug["decision_reason"] = "规则与 LLM 高置信度冲突，进入澄清。"
+        return final, route_debug
+
+    final = llm_result if llm_result.confidence > rule_result.confidence else rule_result
+    route_debug["final_intent"] = final.intent
+    route_debug["decision_reason"] = "规则和 LLM 不一致，选择置信度更高的结果。"
+    return final, route_debug
+
+
+def classify_intent_with_llm(message: str) -> IntentResult | None:
+    client = get_llm_client()
+    if not client.available:
+        return None
+
+    result = client.json_completion(INTENT_RECOGNITION_PROMPT.format(message=message))
+    if not result:
+        return None
+
+    intent = str(result.get("intent") or "UNKNOWN").upper()
+    if intent not in INTENT_KEYWORDS and intent != "UNKNOWN":
+        return None
+    try:
+        confidence = max(0.0, min(1.0, float(result.get("confidence", 0.0))))
+    except (TypeError, ValueError):
+        confidence = 0.0
+    slots = result.get("slots") if isinstance(result.get("slots"), dict) else {}
+    return IntentResult(intent=intent, confidence=confidence, reason=str(result.get("reason") or "LLM 路由结果"), slots=slots)

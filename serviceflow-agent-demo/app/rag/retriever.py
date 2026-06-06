@@ -55,10 +55,15 @@ class SimpleRetriever:
         return [
             {
                 "knowledge_base": doc.knowledge_base,
-                "source": doc.source,
+                "source": doc.source_file,
+                "source_file": doc.source_file,
+                "chunk_id": f"{doc.category}_001",
                 "title": doc.title,
                 "score": round(score, 3),
+                "product_name": doc.product_name,
+                "category": doc.category,
                 "snippet": self._snippet(doc.content),
+                "retriever": "simple",
             }
             for score, doc in scored[:top_k]
         ]

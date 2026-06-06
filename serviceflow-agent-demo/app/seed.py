@@ -6,7 +6,7 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from app.database import Base, SessionLocal, engine
-from app.models import Order, ReturnRequest, Ticket
+from app.models import ChatLog, Conversation, Order, ReturnRequest, Ticket
 
 
 def seed_database(reset: bool = False) -> None:
@@ -14,6 +14,8 @@ def seed_database(reset: bool = False) -> None:
     db = SessionLocal()
     try:
         if reset:
+            db.query(ChatLog).delete()
+            db.query(Conversation).delete()
             db.query(ReturnRequest).delete()
             db.query(Ticket).delete()
             db.query(Order).delete()

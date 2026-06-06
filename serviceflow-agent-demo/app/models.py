@@ -55,3 +55,36 @@ class Ticket(Base, SerializableMixin):
     chat_history: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text, default="OPEN")
     created_at: Mapped[datetime] = mapped_column(DateTime)
+
+
+class Conversation(Base, SerializableMixin):
+    __tablename__ = "conversations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    conversation_id: Mapped[str] = mapped_column(Text, unique=True, index=True)
+    user_id: Mapped[str] = mapped_column(Text, index=True)
+    current_intent: Mapped[str | None] = mapped_column(Text, nullable=True)
+    pending_action: Mapped[str] = mapped_column(Text, default="NONE")
+    slots: Mapped[str] = mapped_column(Text, default="{}")
+    history: Mapped[str] = mapped_column(Text, default="[]")
+    status: Mapped[str] = mapped_column(Text, default="ACTIVE")
+    created_at: Mapped[datetime] = mapped_column(DateTime)
+    updated_at: Mapped[datetime] = mapped_column(DateTime)
+
+
+class ChatLog(Base, SerializableMixin):
+    __tablename__ = "chat_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    conversation_id: Mapped[str] = mapped_column(Text, index=True)
+    user_id: Mapped[str] = mapped_column(Text, index=True)
+    user_message: Mapped[str] = mapped_column(Text)
+    final_answer: Mapped[str] = mapped_column(Text)
+    intent: Mapped[str] = mapped_column(Text)
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    route_trace: Mapped[str] = mapped_column(Text, default="[]")
+    tool_calls: Mapped[str] = mapped_column(Text, default="[]")
+    retrieved_docs: Mapped[str] = mapped_column(Text, default="[]")
+    citations: Mapped[str] = mapped_column(Text, default="[]")
+    evaluation_result: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime)

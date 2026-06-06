@@ -12,34 +12,54 @@
         <div>
           <p class="product-mark">ServiceFlow Agent Demo</p>
           <h1>企业知识库智能客服 Agent</h1>
+          <p class="topbar-copy">订单、售后、知识库检索和人工工单的一屏演示控制台。</p>
         </div>
-        <div class="status-chip" aria-label="系统状态">
-          <span class="status-dot"></span>
-          本地演示环境
+        <div class="topbar-status" aria-label="系统状态">
+          <div class="status-chip">
+            <span class="status-dot"></span>
+            本地演示环境
+          </div>
+          <div class="status-chip muted-chip" id="retriever-status">检索待触发</div>
         </div>
       </header>
 
       <section class="workspace" aria-label="客服 Agent 演示工作台">
         <section class="chat-panel" aria-label="聊天窗口">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">Conversation</p>
+              <h2>客户对话</h2>
+            </div>
+            <span class="session-pill" id="session-pill">User U1001 · Conversation 未创建</span>
+          </div>
+
           <div id="messages" class="messages" aria-live="polite">
             <article class="message assistant">
+              <span class="message-label">Agent</span>
               <p>你好，我可以查询订单、申请退货、回答技术和售后政策问题，也可以在投诉场景创建人工工单。</p>
             </article>
           </div>
 
-          <div class="prompt-row" aria-label="测试问题">
-            <button type="button" data-prompt="帮我查一下订单 10001 到哪里了">查订单 10001</button>
-            <button type="button" data-prompt="我要退货，订单号 10001">退货 10001</button>
-            <button type="button" data-prompt="路由器怎么连接 WiFi">连接 WiFi</button>
-            <button type="button" data-prompt="7 天无理由退货规则是什么">7 天退货规则</button>
-            <button type="button" data-prompt="SmartRouter X1 支持 macOS 吗">macOS 支持</button>
-            <button type="button" data-prompt="我要投诉，转人工客服">投诉转人工</button>
+          <div class="prompt-area">
+            <p>试运行场景</p>
+            <div class="prompt-row" aria-label="测试问题">
+              <button type="button" data-prompt="帮我查一下订单 10001 到哪里了">查订单 10001</button>
+              <button type="button" data-prompt="我要退货">我要退货</button>
+              <button type="button" data-prompt="10001">10001</button>
+              <button type="button" data-prompt="买错了">买错了</button>
+              <button type="button" data-prompt="确认">确认</button>
+              <button type="button" data-prompt="取消">取消</button>
+              <button type="button" data-prompt="路由器怎么连接 WiFi">连接 WiFi</button>
+              <button type="button" data-prompt="7 天无理由退货规则是什么">7 天退货规则</button>
+              <button type="button" data-prompt="SmartRouter X1 支持 macOS 吗">macOS 支持</button>
+              <button type="button" data-prompt="我要投诉，转人工客服">投诉转人工</button>
+            </div>
           </div>
 
           <form id="chat-form" class="composer">
             <label class="sr-only" for="message-input">输入客服问题</label>
             <textarea id="message-input" name="message" rows="2" placeholder="输入问题，例如：我要退货，订单号 10001"></textarea>
-            <button type="submit">发送问题</button>
+            <button type="submit" id="send-button">发送问题</button>
           </form>
           <p id="error-text" class="error-text" role="status"></p>
         </section>
@@ -53,7 +73,15 @@
             <button type="button" id="clear-debug">清空</button>
           </div>
 
+          <section class="decision-card" aria-label="当前决策摘要">
+            <p id="decision-text">发送一个问题后，这里会显示意图识别原因和下一步动作。</p>
+          </section>
+
           <dl class="metrics">
+            <div>
+              <dt>Conversation</dt>
+              <dd id="conversation-id">None</dd>
+            </div>
             <div>
               <dt>Intent</dt>
               <dd id="intent">UNKNOWN</dd>
@@ -66,11 +94,30 @@
               <dt>Ticket</dt>
               <dd id="ticket">None</dd>
             </div>
+            <div>
+              <dt>Pending</dt>
+              <dd id="pending-action">None</dd>
+            </div>
           </dl>
+
+          <section class="trace-card">
+            <h3>Slots</h3>
+            <pre id="slots">{}</pre>
+          </section>
+
+          <section class="trace-card">
+            <h3>Missing Slots</h3>
+            <pre id="missing-slots">[]</pre>
+          </section>
 
           <section class="trace-card">
             <h3>Route Trace</h3>
             <ol id="route-trace" class="trace-list"></ol>
+          </section>
+
+          <section class="trace-card">
+            <h3>Route Debug</h3>
+            <pre id="route-debug">{}</pre>
           </section>
 
           <section class="trace-card">
@@ -79,12 +126,29 @@
           </section>
 
           <section class="trace-card">
+            <h3>Knowledge Hits</h3>
+            <ul id="knowledge-hits" class="hit-list"></ul>
+          </section>
+
+          <section class="trace-card">
             <h3>Retrieved Docs</h3>
             <pre id="retrieved-docs">[]</pre>
+          </section>
+
+          <section class="trace-card">
+            <h3>Citations</h3>
+            <pre id="citations">[]</pre>
+          </section>
+
+          <section class="trace-card">
+            <h3>Evaluation</h3>
+            <pre id="evaluation-result">{}</pre>
           </section>
         </aside>
       </section>
     </main>
+    <script src="/static/vendor/gsap.min.js"></script>
+    <script src="/static/vendor/ScrollTrigger.min.js"></script>
     <script src="/static/app.js"></script>
   </body>
 </html>

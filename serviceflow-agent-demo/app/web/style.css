@@ -1,14 +1,19 @@
 :root {
-  --bg: #f7f8f5;
+  --bg: #eef2ef;
   --surface: #ffffff;
   --surface-strong: #101316;
+  --surface-muted: #f6f8f6;
   --ink: #111827;
-  --muted: #53606e;
-  --line: #d9ded8;
+  --muted: #4e5d68;
+  --line: #d4ddd5;
+  --line-strong: #b9c6be;
   --accent: #1f6f5b;
   --accent-strong: #134e40;
+  --accent-soft: #e5f0eb;
+  --info: #244f79;
+  --info-soft: #e7eef5;
   --danger: #a33a2b;
-  --shadow: 0 18px 50px rgba(17, 24, 39, 0.12);
+  --shadow: 0 18px 42px rgba(17, 24, 39, 0.10);
   --z-sticky: 20;
 }
 
@@ -38,6 +43,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 button:focus-visible,
 textarea:focus-visible {
   outline: 3px solid rgba(31, 111, 91, 0.35);
@@ -60,9 +70,17 @@ textarea:focus-visible {
   justify-content: space-between;
   gap: 24px;
   max-width: 1440px;
-  margin: 0 auto 20px;
-  padding: 12px 0;
+  margin: 0 auto 16px;
+  padding: 10px 0 14px;
   background: var(--bg);
+}
+
+.topbar > div,
+.workspace,
+.chat-panel,
+.debug-panel,
+.panel-heading > div {
+  min-width: 0;
 }
 
 .product-mark,
@@ -71,6 +89,14 @@ textarea:focus-visible {
   color: var(--accent-strong);
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.topbar-copy {
+  max-width: 68ch;
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 h1,
@@ -82,8 +108,9 @@ h3 {
 
 h1 {
   max-width: 760px;
-  font-size: clamp(1.5rem, 3vw, 2.8rem);
-  line-height: 1.05;
+  font-size: 2.55rem;
+  line-height: 1.06;
+  overflow-wrap: anywhere;
 }
 
 h2 {
@@ -98,18 +125,32 @@ p {
   text-wrap: pretty;
 }
 
+.topbar-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .status-chip {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   flex: 0 0 auto;
-  padding: 10px 14px;
+  min-height: 38px;
+  padding: 8px 13px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--muted);
+  color: var(--ink);
   font-size: 0.9rem;
+  font-weight: 700;
   box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+}
+
+.muted-chip {
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .status-dot {
@@ -121,15 +162,17 @@ p {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 500px);
+  gap: 18px;
   max-width: 1440px;
+  height: clamp(620px, calc(100dvh - 150px), 820px);
   margin: 0 auto;
 }
 
 .chat-panel,
 .debug-panel {
-  min-height: calc(100dvh - 150px);
+  min-height: 0;
+  height: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -138,25 +181,53 @@ p {
 
 .chat-panel {
   display: grid;
-  grid-template-rows: 1fr auto auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
   overflow: hidden;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-muted);
+}
+
+.session-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .messages {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  min-height: 360px;
-  max-height: calc(100dvh - 310px);
-  padding: 22px;
+  gap: 12px;
+  /* 消息区是聊天工作台的主区域，不能被小视口的 max-height 压得太矮。 */
+  min-height: 0;
+  height: 100%;
+  padding: 20px;
   overflow-y: auto;
+  background: #fbfcfb;
 }
 
 .message {
   max-width: min(74ch, 86%);
-  padding: 14px 16px;
+  padding: 12px 14px 14px;
   border-radius: 8px;
   border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+  transform-origin: center top;
 }
 
 .message p {
@@ -164,23 +235,61 @@ p {
   line-height: 1.65;
 }
 
+.message-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 .message.user {
   align-self: flex-end;
   background: var(--surface-strong);
   color: #ffffff;
+  border-color: var(--surface-strong);
+}
+
+.message.user .message-label {
+  color: #b8c4cc;
 }
 
 .message.assistant {
   align-self: flex-start;
-  background: #f2f5f1;
+  background: var(--accent-soft);
+  border-color: #c9dbd1;
+}
+
+.message.system {
+  align-self: flex-start;
+  background: var(--info-soft);
+  border-color: #c7d6e4;
+}
+
+.message.tool {
+  align-self: flex-start;
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.prompt-area {
+  padding: 13px 18px 15px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-muted);
+}
+
+.prompt-area p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .prompt-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 14px 18px;
-  border-top: 1px solid var(--line);
 }
 
 .prompt-row button,
@@ -189,7 +298,7 @@ p {
   padding: 8px 11px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f9faf8;
+  background: #ffffff;
   color: var(--ink);
   transition: transform 160ms ease-out, border-color 160ms ease-out;
 }
@@ -203,19 +312,22 @@ p {
 .composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 18px;
+  align-items: end;
+  gap: 10px;
+  padding: 16px 18px 14px;
   border-top: 1px solid var(--line);
+  background: #ffffff;
 }
 
 textarea {
   width: 100%;
-  min-height: 52px;
-  max-height: 150px;
+  min-height: 58px;
+  max-height: 142px;
   resize: vertical;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px 14px;
+  background: var(--surface-muted);
   color: var(--ink);
 }
 
@@ -224,6 +336,7 @@ textarea::placeholder {
 }
 
 .composer button {
+  min-height: 58px;
   min-width: 112px;
   border-radius: 8px;
   background: var(--accent-strong);
@@ -232,19 +345,20 @@ textarea::placeholder {
 }
 
 .error-text {
-  min-height: 24px;
+  min-height: 22px;
   margin: 0;
-  padding: 0 18px 16px;
+  padding: 0 18px 12px;
   color: var(--danger);
   font-weight: 600;
+  background: #ffffff;
 }
 
 .debug-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 18px;
-  overflow: hidden;
+  gap: 14px;
+  padding: 16px;
+  overflow-y: auto;
 }
 
 .debug-header {
@@ -256,21 +370,37 @@ textarea::placeholder {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
 }
 
 .metrics div,
-.trace-card {
+.trace-card,
+.decision-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfcfa;
 }
 
+.decision-card {
+  padding: 13px 14px;
+  background: var(--info-soft);
+  border-color: #c7d6e4;
+  transform-origin: center top;
+}
+
+.decision-card p {
+  margin: 0;
+  color: #1d3f60;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .metrics div {
   min-width: 0;
-  padding: 12px;
+  padding: 11px;
+  background: #ffffff;
 }
 
 .metrics dt {
@@ -288,8 +418,9 @@ textarea::placeholder {
 
 .trace-card {
   min-height: 90px;
-  padding: 14px;
+  padding: 13px;
   overflow: auto;
+  transform-origin: center top;
 }
 
 .trace-list {
@@ -303,8 +434,42 @@ textarea::placeholder {
   font-variant-numeric: tabular-nums;
 }
 
+.hit-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hit-list li {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  transform-origin: center top;
+}
+
+.hit-list strong,
+.hit-list small {
+  font-variant-numeric: tabular-nums;
+}
+
+.hit-list span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.hit-list small {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
 pre {
-  max-height: 220px;
+  max-height: 190px;
   margin: 12px 0 0;
   overflow: auto;
   white-space: pre-wrap;
@@ -333,23 +498,38 @@ pre {
     flex-direction: column;
   }
 
+  .topbar-status {
+    justify-content: flex-start;
+  }
+
   .workspace {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .chat-panel,
   .debug-panel {
-    min-height: auto;
+    min-height: 560px;
+    height: auto;
   }
 
   .messages {
-    max-height: none;
+    min-height: 360px;
   }
 }
 
 @media (max-width: 620px) {
   .app-shell {
     padding: 14px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .panel-heading,
+  .composer {
+    grid-template-columns: 1fr;
   }
 
   .message {
