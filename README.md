@@ -2,6 +2,8 @@
 
 ServiceFlow Agent Demo 是一个本地可运行的企业级知识库智能客服 Agent。它面向电商和数码产品售后场景，支持订单查询、退货申请、技术咨询、售后政策问答、产品咨询和投诉转人工。
 
+项目代码位于 [`serviceflow-agent-demo`](./serviceflow-agent-demo) 目录。把 README 放在仓库根目录后，GitHub 打开仓库首页即可直接预览完整说明。
+
 ## 为什么这不是普通 RAG
 
 普通 RAG 通常把用户问题直接送去知识库检索，再生成回答。这个 Demo 会先识别意图，再通过 LangGraph 路由到不同流程：有些问题查 SQLite 订单库，有些调用模拟 ERP 工具，有些检索指定知识库，有些直接创建人工客服工单。每次响应都会返回 `route_trace`、`tool_calls`、`retrieved_docs` 和 `ticket_id`，方便演示 Agent 的决策过程。
