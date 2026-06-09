@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT))
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+from app.rate_limit import reset_rate_limit_buckets  # noqa: E402
 from app.seed import seed_database  # noqa: E402
 from evals.metrics import accuracy, confusion_matrix, rate  # noqa: E402
 from main import app  # noqa: E402
@@ -26,6 +27,8 @@ def load_jsonl(name: str) -> list[dict]:
 
 
 def post_chat(client: TestClient, message: str, conversation_id: str | None = None) -> dict:
+    # 离线评测关注业务链路质量，避免 TestClient 固定 IP 触发 Demo 防刷限流。
+    reset_rate_limit_buckets()
     response = client.post("/api/chat", json={"message": message, "user_id": "U1001", "conversation_id": conversation_id})
     response.raise_for_status()
     return response.json()
