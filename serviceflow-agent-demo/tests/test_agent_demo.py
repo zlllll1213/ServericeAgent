@@ -1,23 +1,24 @@
-from fastapi.testclient import TestClient
-
-from app.seed import seed_database
-from main import app
+import pytest
 
 
-client = TestClient(app)
+client = None
+post_chat = None
+_admin_headers = None
 
 
-def setup_function():
-    seed_database(reset=True)
+@pytest.fixture(autouse=True)
+def bind_shared_test_helpers(client, admin_headers, chat):
+    globals()["client"] = client
+    globals()["post_chat"] = chat
+    globals()["_admin_headers"] = admin_headers
 
 
-def post_chat(message: str, conversation_id: str | None = None):
-    response = client.post(
-        "/api/chat",
-        json={"message": message, "user_id": "U1001", "conversation_id": conversation_id},
-    )
-    assert response.status_code == 200
-    return response.json()
+def admin_get(path: str):
+    return client.get(path, headers=_admin_headers)
+
+
+def admin_post(path: str, payload: dict | None = None):
+    return client.post(path, json=payload or {}, headers=_admin_headers)
 
 
 def test_order_query_returns_sqlite_order_and_trace():
@@ -185,3 +186,156 @@ def test_conversation_logs_include_trace_tools_and_evaluation():
     reset = client.post(f"/api/conversations/{conversation_id}/reset")
     assert reset.status_code == 200
     assert reset.json()["status"] == "RESET"
+
+
+def test_human_handoff_assign_reply_and_resolve_flow():
+    data = post_chat("我要找人工客服")
+    conversation_id = data["conversation_id"]
+
+    assert data["need_human"] is True
+    assert data["ticket_id"].startswith("T")
+
+    conversation = admin_get(f"/api/admin/conversations/{conversation_id}").json()
+    assert conversation["status"] == "WAITING_HUMAN"
+    assert conversation["handoff_status"] == "REQUESTED"
+
+    assign = admin_post(f"/api/admin/conversations/{conversation_id}/assign", {"agent_id": "S1001"})
+    assert assign.status_code == 200
+    assert assign.json()["status"] == "HUMAN_HANDLING"
+    assert assign.json()["assigned_agent_id"] == "S1001"
+
+    blocked = post_chat("人工客服在吗", conversation_id=conversation_id)
+    assert blocked["answer"] == "人工客服正在处理中，请等待客服回复。"
+    assert blocked["route_trace"] == [
+        "load_conversation_node",
+        "human_handoff_node",
+        "final_response_node",
+        "evaluation_node",
+        "save_conversation_node",
+    ]
+    assert blocked["evaluation_result"]["need_human_review"] is True
+
+    reply = admin_post(
+        f"/api/admin/conversations/{conversation_id}/reply",
+        {"agent_id": "S1001", "message": "您好，我是人工客服，请问您遇到了什么问题？"},
+    )
+    assert reply.status_code == 200
+    assert reply.json()["history"][-1]["sender"] == "human_agent"
+
+    resolved = admin_post(
+        f"/api/admin/conversations/{conversation_id}/resolve",
+        {"agent_id": "S1001", "resolution": "已为用户解释退货政策。"},
+    )
+    assert resolved.status_code == 200
+    assert resolved.json()["status"] == "CLOSED"
+    assert resolved.json()["handoff_status"] == "RESOLVED"
+
+
+def test_admin_ticket_assignment_and_resolution_flow():
+    data = post_chat("我要投诉，找人工客服")
+    ticket_id = data["ticket_id"]
+
+    tickets = admin_get("/api/admin/tickets").json()
+    assert any(ticket["ticket_id"] == ticket_id for ticket in tickets)
+
+    assigned = admin_post(f"/api/admin/tickets/{ticket_id}/assign", {"agent_id": "S1001"})
+    assert assigned.status_code == 200
+    assert assigned.json()["status"] == "ASSIGNED"
+    assert assigned.json()["assigned_agent_id"] == "S1001"
+
+    resolved = admin_post(
+        f"/api/admin/tickets/{ticket_id}/resolve",
+        {"agent_id": "S1001", "resolution": "已联系用户并解决问题。"},
+    )
+    assert resolved.status_code == 200
+    assert resolved.json()["status"] == "RESOLVED"
+    assert resolved.json()["resolution"] == "已联系用户并解决问题。"
+
+    closed = admin_post(f"/api/admin/tickets/{ticket_id}/close")
+    assert closed.status_code == 200
+    assert closed.json()["status"] == "CLOSED"
+
+
+def test_knowledge_document_publish_is_retrievable_and_cited():
+    created = client.post(
+        "/api/admin/knowledge-documents",
+        json={
+            "title": "延保服务政策",
+            "knowledge_base": "policy",
+            "content": "SmartRouter X1 支持购买 1 年延保服务，延保期内非人为损坏可免费维修。",
+        },
+        headers=_admin_headers,
+    )
+    assert created.status_code == 200
+    doc_id = created.json()["doc_id"]
+    assert created.json()["status"] == "DRAFT"
+
+    published = admin_post(f"/api/admin/knowledge-documents/{doc_id}/publish")
+    assert published.status_code == 200
+    assert published.json()["status"] == "PUBLISHED"
+
+    answer = post_chat("SmartRouter X1 有延保服务吗？")
+    assert answer["intent"] in {"POLICY_QA", "PRODUCT_QA"}
+    assert any(citation["source_file"] == f"{doc_id}.md" for citation in answer["citations"])
+    assert "延保" in answer["answer"]
+
+
+def test_feedback_and_evaluation_summary_update():
+    data = post_chat("7 天无理由退货规则是什么")
+    logs = client.get(f"/api/conversations/{data['conversation_id']}/logs").json()
+    chat_log_id = logs[-1]["id"]
+
+    feedback = client.post(
+        "/api/feedback",
+        json={
+            "conversation_id": data["conversation_id"],
+            "chat_log_id": chat_log_id,
+            "user_id": "U1001",
+            "rating": 2,
+            "feedback_type": "WRONG_INTENT",
+            "comment": "用户问的是售后政策，但系统路由到了产品咨询。",
+        },
+    )
+    assert feedback.status_code == 200
+    assert feedback.json()["feedback_type"] == "WRONG_INTENT"
+
+    feedback_list = admin_get("/api/admin/feedback").json()
+    assert feedback_list[0]["feedback_type"] == "WRONG_INTENT"
+
+    summary = admin_get("/api/admin/evaluation-summary").json()
+    assert summary["total_chats"] >= 1
+    assert summary["negative_feedback_count"] == 1
+    assert summary["top_error_types"][0]["type"] == "WRONG_INTENT"
+
+
+def test_auth_health_trace_and_metrics_smoke():
+    login = client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+    assert login.status_code == 200
+    token = login.json()["access_token"]
+
+    bad_login = client.post("/api/auth/login", json={"username": "admin", "password": "wrong"})
+    assert bad_login.status_code == 401
+
+    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 200
+    assert me.json()["role"] == "admin"
+
+    unauthorized = client.get("/api/admin/conversations")
+    assert unauthorized.status_code == 401
+
+    health = client.get("/api/health")
+    assert health.status_code == 200
+    assert health.json()["status"] == "ok"
+
+    data = post_chat("我要退货，订单号 10001，原因是买错了")
+    traces = admin_get(f"/api/admin/traces?trace_id={data['trace_id']}").json()
+    assert {trace["node_name"] for trace in traces} >= {"load_conversation_node", "slot_filling_node"}
+
+    chain = admin_get(f"/api/admin/traces/{data['trace_id']}").json()
+    assert chain["trace_id"] == data["trace_id"]
+    assert chain["nodes"][0]["input_state"]
+
+    metrics = admin_get("/api/admin/metrics/overview").json()
+    assert metrics["total_chats_today"] >= 1
+    assert "intent_distribution" in metrics
+    assert "tool_success_rate" in metrics

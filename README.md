@@ -18,6 +18,35 @@ ServiceFlow Agent Demo 是一个本地可运行的企业级知识库智能客服
 - 回答质量评估：每轮回复写入 `evaluation_result`，并落库到 `chat_logs`。
 - 前端调试面板增强：展示 slots、route_debug、citations、evaluation_result 和多轮测试按钮。
 
+## V0.4 更新内容
+
+- 新增客服后台页面：访问 `/admin?role=agent` 或 `/admin?role=admin`。
+- 新增简单角色：`customer`、`agent`、`admin`，第一版通过 URL 参数或请求头模拟。
+- 新增会话管理：后台可查看会话列表、详情、认领、人工回复和关闭会话。
+- 新增工单管理：后台可查看工单、认领、处理、关闭。
+- 新增知识库管理：后台可新建、发布、归档文档，并触发重建索引。
+- 新增 Agent 日志可视化：后台展示最近 `chat_logs`。
+- 新增质量反馈：用户可对回答点赞或差评，后台可查看反馈和质量统计。
+- 新增人工接管逻辑：会话进入 `HUMAN_HANDLING` 后，普通聊天不再触发 Agent 自动回复。
+
+## V0.6 更新内容
+
+- 新增 Agent Trace：每次 `/api/chat` 生成 `trace_id`，LangGraph 节点输入、输出、耗时和错误写入 `agent_traces`。
+- 新增 Metrics API：统计今日对话数、平均响应时间、P95、意图分布、工具成功率、人工转接率、差评率和错误率。
+- 新增自动化测试目录：覆盖认证、健康检查、订单查询、多轮退货、RAG、人工接管、工具函数、Retriever、Trace 等核心路径。
+- 新增 Agent 评测集：`intent`、`rag`、`tool`、`e2e` 四类 JSONL 数据集。
+- 新增评测脚本：`python evals/run_eval.py --all` 会生成 `reports/eval_report_日期.md`。
+- 新增压测脚本：`python scripts/load_test.py --users 20 --requests 200` 会生成压测报告。
+- 新增 GitHub Actions CI：执行 lint、pytest 和轻量评测。
+- 新增后台页面菜单：Agent Trace、Metrics 看板、Evaluation 报告。
+- 新增工程文档：`docs/api.md`、`docs/architecture.md`、`docs/evaluation.md`、`docs/deployment.md`、`docs/testing.md`。
+
+## 角色说明
+
+- `customer`：普通用户，可以使用 `/` 发起聊天、转人工、提交回答反馈。
+- `agent`：人工客服，可以通过 `/admin?role=agent` 查看并认领会话、回复用户、处理工单。
+- `admin`：管理员，可以通过 `/admin?role=admin` 管理知识库、查看日志和质检统计。
+
 ## 系统架构图
 
 ```mermaid
@@ -87,6 +116,19 @@ flowchart TD
 - Uvicorn
 - 原生 HTML / CSS / JavaScript
 
+## 常用命令
+
+```bash
+make dev
+make test
+make eval
+make lint
+make format
+make coverage
+make docker-up
+make docker-down
+```
+
 ## 启动方式（无 Qdrant 兜底模式）
 
 ```bash
@@ -105,6 +147,21 @@ http://127.0.0.1:8000
 ```
 
 这个模式不要求 Qdrant 已启动。后端会优先尝试 Qdrant，如果连接失败，会自动使用 `SimpleRetriever`，方便快速演示。
+
+后台访问：
+
+```text
+http://127.0.0.1:8000/admin?role=admin
+http://127.0.0.1:8000/admin?role=agent
+```
+
+后台 API 默认使用 Bearer token。`X-User-Role` 只在显式设置 `DEMO_AUTH_ENABLED=true` 的本地演示模式下生效，不应作为生产认证方式。
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin"}'
+```
 
 ## Qdrant Docker Compose 启动方式
 
@@ -202,6 +259,41 @@ PRODUCT_QA   -> knowledge_base = product
 
 取消词包括：`取消`、`算了`、`不用了`、`先不退了`。确认词包括：`确认`、`是的`、`可以`、`提交`、`帮我创建`。
 
+## 人工接管流程
+
+当 Agent 判断需要人工介入时，会创建工单，并将会话状态改为 `WAITING_HUMAN`、`handoff_status=REQUESTED`。客服在后台认领后，会话变为 `HUMAN_HANDLING`、`handoff_status=ASSIGNED`，后续用户在普通聊天页继续发消息时，系统只写入会话历史并返回“人工客服正在处理中，请等待客服回复。”，不会再调用 Agent 自动回复。
+
+客服通过后台“人工回复”写入 `conversation.history`，消息的 `sender` 为 `human_agent`。普通聊天页会轮询当前会话历史，因此可以看到人工客服回复。会话关闭后状态为 `CLOSED`、`handoff_status=RESOLVED`；第一版中，如果用户继续发消息，会重新激活会话。
+
+## 工单处理流程
+
+后台工单管理支持查看、认领、处理和关闭。工单状态流转为：
+
+```text
+OPEN -> ASSIGNED -> RESOLVED -> CLOSED
+```
+
+认领会写入 `assigned_agent_id`，处理会写入 `resolution` 和 `updated_at`。
+
+## 知识库管理流程
+
+管理员可在后台创建知识库文档，文档默认 `DRAFT`、`version=1`。发布文档时，系统会写入：
+
+```text
+knowledge_base/{tech|policy|product}/{doc_id}.md
+```
+
+如果 Qdrant 可用，会尝试重建索引；如果 Qdrant 不可用，则依靠 `SimpleRetriever` fallback，下一次检索会读取新 Markdown 文档。
+
+## 质量反馈流程
+
+普通聊天页支持：
+
+- 👍 有帮助
+- 👎 没帮助
+
+差评可选择：答非所问、工具调用错误、没有引用来源、我想找人工客服。反馈会写入 `agent_feedback`，后台质量反馈页会展示反馈列表和 `evaluation-summary` 统计。
+
 ## API 示例
 
 ### POST /api/chat
@@ -246,6 +338,109 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 ### POST /api/conversations/{conversation_id}/reset
 
 重置当前会话状态，清空 slots、history 和 pending_action。
+
+### V0.4 后台 API
+
+- `GET /api/admin/conversations`
+- `GET /api/admin/conversations/{conversation_id}`
+- `POST /api/admin/conversations/{conversation_id}/assign`
+- `POST /api/admin/conversations/{conversation_id}/reply`
+- `POST /api/admin/conversations/{conversation_id}/resolve`
+- `GET /api/admin/tickets`
+- `GET /api/admin/tickets/{ticket_id}`
+- `POST /api/admin/tickets/{ticket_id}/assign`
+- `POST /api/admin/tickets/{ticket_id}/resolve`
+- `POST /api/admin/tickets/{ticket_id}/close`
+- `GET /api/admin/knowledge-documents`
+- `POST /api/admin/knowledge-documents`
+- `PUT /api/admin/knowledge-documents/{doc_id}`
+- `POST /api/admin/knowledge-documents/{doc_id}/publish`
+- `POST /api/admin/knowledge-documents/{doc_id}/archive`
+- `POST /api/admin/knowledge-documents/reindex`
+- `POST /api/feedback`
+- `GET /api/admin/feedback`
+- `GET /api/admin/evaluation-summary`
+- `GET /api/admin/chat-logs`
+
+### V0.6 Trace / Metrics / Evaluation API
+
+- `GET /api/admin/traces`
+- `GET /api/admin/traces/{trace_id}`
+- `GET /api/admin/metrics/overview`
+- `GET /api/admin/metrics/daily`
+- `GET /api/admin/evaluation-reports`
+- `GET /api/admin/evaluation-reports/latest`
+- `GET /api/admin/evaluation-reports/{filename}/download`
+
+## V0.6 自动化测试
+
+```bash
+cd serviceflow-agent-demo
+make test
+make coverage
+```
+
+测试目录按能力拆分：认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和 tenant 契约。当前仓库仍是 SQLite 单体 Demo，完整 PostgreSQL/Redis/MinIO/多租户强隔离测试在本阶段以契约或 skip 标注保留入口。
+
+## Agent 评测集
+
+```bash
+cd serviceflow-agent-demo
+make eval
+python evals/run_eval.py --dataset intent
+python evals/run_eval.py --dataset rag
+python evals/run_eval.py --dataset tool
+python evals/run_eval.py --dataset e2e
+```
+
+评测数据位于 `evals/datasets/`，报告写入 `reports/eval_report_日期.md`。新增评测样本时保持 JSONL 每行一个样本，并补充 `id`、`tenant_id`、输入和期望字段。
+
+## Trace 与 Metrics
+
+每次聊天响应都会返回 `trace_id`。后台 `/admin?role=admin` 的 Agent Trace 页面可以查看完整节点链路；Metrics 看板展示今日对话数、响应时间、意图分布、工具成功率、人工转接率和错误率。
+
+## 压测
+
+先启动服务，再执行：
+
+```bash
+cd serviceflow-agent-demo
+python scripts/load_test.py --users 10 --requests 100
+```
+
+脚本会输出成功率、平均响应时间、P95、QPS，并生成 `reports/load_test_report_日期.md`。
+
+## V0.4 测试流程
+
+### 测试一：人工转接
+
+用户输入“我要找人工客服”。
+
+期望：Agent 创建工单；`conversation.status` 变为 `WAITING_HUMAN`；后台会话列表出现该会话；后台工单列表出现对应工单。
+
+### 测试二：客服认领会话
+
+后台点击认领。
+
+期望：`conversation.status` 变为 `HUMAN_HANDLING`；`assigned_agent_id` 写入当前客服。
+
+### 测试三：客服回复
+
+客服发送“您好，我是人工客服，请问您遇到了什么问题？”
+
+期望：用户聊天页面能看到人工客服回复；`sender` 为 `human_agent`；Agent 不自动回复。
+
+### 测试四：知识库新增
+
+管理员新增 policy 文档“延保服务政策”，发布后用户提问“SmartRouter X1 有延保服务吗？”
+
+期望：Agent 能检索到新文档；`citations` 包含新文档。
+
+### 测试五：用户反馈
+
+用户对 Agent 回答点“没帮助”。
+
+期望：`agent_feedback` 表新增记录；后台质量反馈页面可看到；`evaluation-summary` 统计更新。
 
 ### GET /api/orders/{order_id}
 

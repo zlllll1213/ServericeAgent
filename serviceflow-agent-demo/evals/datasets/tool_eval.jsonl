@@ -1,0 +1,20 @@
+{"id":"tool_001","tenant_id":"T1001","input":"帮我查一下订单 10001","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_002","tenant_id":"T1001","input":"订单 10002 到哪里了","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_003","tenant_id":"T1001","input":"查询订单 99999","expected_tool":"get_order_status","expected_success":false}
+{"id":"tool_004","tenant_id":"T1001","input":"快递订单 10003","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_005","tenant_id":"T1001","input":"我要退货，订单号 10001，原因是买错了","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_006","tenant_id":"T1001","input":"我要退货，订单号 10003，原因是买错了","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_007","tenant_id":"T1001","input":"我要退货，订单号 99999，原因是买错了","expected_tool":"get_order_status","expected_success":false}
+{"id":"tool_008","tenant_id":"T1001","input":"查询退货单 R00000001","expected_tool":"get_refund_status","expected_success":false}
+{"id":"tool_009","tenant_id":"T1001","input":"退货进度 R00000002","expected_tool":"get_refund_status","expected_success":false}
+{"id":"tool_010","tenant_id":"T1001","input":"return_id R00000003","expected_tool":"get_refund_status","expected_success":false}
+{"id":"tool_011","tenant_id":"T1001","input":"我要投诉，找人工客服","expected_tool":"create_ticket","expected_success":true}
+{"id":"tool_012","tenant_id":"T1001","input":"我要找人工客服","expected_tool":"create_ticket","expected_success":true}
+{"id":"tool_013","tenant_id":"T1001","input":"服务太差我要投诉","expected_tool":"create_ticket","expected_success":true}
+{"id":"tool_014","tenant_id":"T1001","input":"转人工客服","expected_tool":"create_ticket","expected_success":true}
+{"id":"tool_015","tenant_id":"T1001","input":"订单 10001 可以退货吗，原因是质量问题","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_016","tenant_id":"T1001","input":"订单号 10002 发货了吗","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_017","tenant_id":"T1001","input":"10001 物流","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_018","tenant_id":"T1001","input":"退货单 R99999999","expected_tool":"get_refund_status","expected_success":false}
+{"id":"tool_019","tenant_id":"T1001","input":"我要退货，订单号 10001，因为不想要了","expected_tool":"get_order_status","expected_success":true}
+{"id":"tool_020","tenant_id":"T1001","input":"人工客服在哪里","expected_tool":"create_ticket","expected_success":true}

@@ -1,0 +1,35 @@
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+extend-exclude = ["reports"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = []
+
+[tool.black]
+line-length = 140
+target-version = ["py311"]
+exclude = '''
+/(
+  \.venv
+  | reports
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+  "app/web/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 0

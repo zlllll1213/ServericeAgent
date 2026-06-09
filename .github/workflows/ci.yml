@@ -1,0 +1,44 @@
+name: ServiceFlow CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: serviceflow-agent-demo
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.12.4
+        ports:
+          - 6333:6333
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            serviceflow-agent-demo/requirements.txt
+            serviceflow-agent-demo/requirements-dev.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r requirements-dev.txt
+      - name: Seed demo database
+        run: python app/seed.py
+      - name: Lint
+        run: make lint
+      - name: Test
+        run: make test
+      - name: Evaluation smoke
+        run: make eval
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: serviceflow-reports
+          path: serviceflow-agent-demo/reports

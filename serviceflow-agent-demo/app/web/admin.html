@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ServiceFlow Admin</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <aside class="admin-sidebar">
+        <p class="product-mark">ServiceFlow Admin</p>
+        <h1>客服后台</h1>
+        <div class="role-switch">
+          <span>Role</span>
+          <strong id="admin-role">agent</strong>
+        </div>
+        <nav class="admin-nav" aria-label="后台导航">
+          <button type="button" data-view="conversations" class="active">会话列表</button>
+          <button type="button" data-view="tickets">工单管理</button>
+          <button type="button" data-view="knowledge">知识库管理</button>
+          <button type="button" data-view="logs">Agent 日志</button>
+          <button type="button" data-view="traces">Agent Trace</button>
+          <button type="button" data-view="metrics">Metrics 看板</button>
+          <button type="button" data-view="evaluation">Evaluation 报告</button>
+          <button type="button" data-view="feedback">质量反馈</button>
+        </nav>
+      </aside>
+
+      <section class="admin-content">
+        <header class="admin-header">
+          <div>
+            <p class="panel-kicker">Operations</p>
+            <h2 id="admin-title">会话列表</h2>
+          </div>
+          <button type="button" id="admin-refresh">刷新</button>
+        </header>
+
+        <section id="view-conversations" class="admin-view"></section>
+        <section id="view-tickets" class="admin-view hidden"></section>
+        <section id="view-knowledge" class="admin-view hidden"></section>
+        <section id="view-logs" class="admin-view hidden"></section>
+        <section id="view-traces" class="admin-view hidden"></section>
+        <section id="view-metrics" class="admin-view hidden"></section>
+        <section id="view-evaluation" class="admin-view hidden"></section>
+        <section id="view-feedback" class="admin-view hidden"></section>
+      </section>
+    </main>
+    <script src="/static/admin.js"></script>
+  </body>
+</html>

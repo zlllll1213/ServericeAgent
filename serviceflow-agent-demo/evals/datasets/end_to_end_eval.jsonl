@@ -1,0 +1,10 @@
+{"id":"e2e_001","tenant_id":"T1001","messages":["我要退货","10001","买错了","确认"],"expected_final_intent":"RETURN_REQUEST","expected_tools":["get_order_status","create_return_request"],"expected_state":{"return_created":true}}
+{"id":"e2e_002","tenant_id":"T1001","messages":["我要退货，订单号 10001，原因是买错了","确认"],"expected_final_intent":"RETURN_REQUEST","expected_tools":["get_order_status","create_return_request"],"expected_state":{"return_created":true}}
+{"id":"e2e_003","tenant_id":"T1001","messages":["我要退货","10001","质量问题","取消"],"expected_final_intent":"RETURN_REQUEST","expected_tools":["get_order_status"],"expected_state":{"return_created":false}}
+{"id":"e2e_004","tenant_id":"T1001","messages":["帮我查一下订单 10001 到哪里了"],"expected_final_intent":"ORDER_QUERY","expected_tools":["get_order_status"],"expected_state":{"return_created":false}}
+{"id":"e2e_005","tenant_id":"T1001","messages":["路由器无法连接 WiFi 怎么办？"],"expected_final_intent":"TECH_SUPPORT","expected_tools":[],"expected_state":{"return_created":false}}
+{"id":"e2e_006","tenant_id":"T1001","messages":["7 天无理由退货规则是什么？"],"expected_final_intent":"POLICY_QA","expected_tools":[],"expected_state":{"return_created":false}}
+{"id":"e2e_007","tenant_id":"T1001","messages":["SmartRouter X1 支持 macOS 吗？"],"expected_final_intent":"PRODUCT_QA","expected_tools":[],"expected_state":{"return_created":false}}
+{"id":"e2e_008","tenant_id":"T1001","messages":["我要投诉，找人工客服"],"expected_final_intent":"COMPLAINT","expected_tools":["create_ticket"],"expected_state":{"return_created":false}}
+{"id":"e2e_009","tenant_id":"T1001","messages":["我要找人工客服"],"expected_final_intent":"HUMAN_TRANSFER","expected_tools":["create_ticket"],"expected_state":{"return_created":false}}
+{"id":"e2e_010","tenant_id":"T1001","messages":["我要退货，订单号 10003，原因是买错了"],"expected_final_intent":"RETURN_REQUEST","expected_tools":["get_order_status"],"expected_state":{"return_created":false}}

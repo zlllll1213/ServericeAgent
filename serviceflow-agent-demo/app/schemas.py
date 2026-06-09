@@ -11,6 +11,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     conversation_id: str
+    trace_id: str | None = None
     answer: str
     intent: str
     confidence: float
@@ -55,7 +56,10 @@ class TicketResponse(BaseModel):
     summary: str
     chat_history: str
     status: str
+    assigned_agent_id: str | None = None
+    resolution: str | None = None
     created_at: str
+    updated_at: str | None = None
 
 
 class ReturnResponse(BaseModel):
@@ -75,6 +79,8 @@ class ConversationResponse(BaseModel):
     slots: dict[str, Any] = Field(default_factory=dict)
     history: list[dict[str, Any]] = Field(default_factory=list)
     status: str
+    assigned_agent_id: str | None = None
+    handoff_status: str = "NONE"
     created_at: str
     updated_at: str
 
@@ -82,7 +88,9 @@ class ConversationResponse(BaseModel):
 class ChatLogResponse(BaseModel):
     id: int
     conversation_id: str
+    trace_id: str | None = None
     user_id: str
+    sender: str = "agent"
     user_message: str
     final_answer: str
     intent: str
@@ -92,4 +100,65 @@ class ChatLogResponse(BaseModel):
     retrieved_docs: list[dict[str, Any]] = Field(default_factory=list)
     citations: list[dict[str, Any]] = Field(default_factory=list)
     evaluation_result: dict[str, Any] = Field(default_factory=dict)
+    created_at: str
+
+
+class AssignRequest(BaseModel):
+    agent_id: str = Field(min_length=1)
+
+
+class HumanReplyRequest(BaseModel):
+    agent_id: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+
+
+class ResolveRequest(BaseModel):
+    agent_id: str = Field(min_length=1)
+    resolution: str = Field(min_length=1)
+
+
+class KnowledgeDocumentCreate(BaseModel):
+    title: str = Field(min_length=1)
+    knowledge_base: str = Field(pattern="^(tech|policy|product)$")
+    content: str = Field(min_length=1)
+    created_by: str = "admin"
+
+
+class KnowledgeDocumentUpdate(BaseModel):
+    title: str | None = None
+    content: str | None = None
+    knowledge_base: str | None = Field(default=None, pattern="^(tech|policy|product)$")
+
+
+class KnowledgeDocumentResponse(BaseModel):
+    id: int
+    doc_id: str
+    title: str
+    knowledge_base: str
+    source_file: str | None = None
+    content: str
+    status: str
+    version: int
+    created_by: str
+    created_at: str
+    updated_at: str
+
+
+class FeedbackRequest(BaseModel):
+    conversation_id: str
+    chat_log_id: int
+    user_id: str
+    rating: int = Field(ge=1, le=5)
+    feedback_type: str = Field(pattern="^(GOOD|WRONG_INTENT|WRONG_TOOL|BAD_ANSWER|MISSING_CITATION|NEED_HUMAN)$")
+    comment: str | None = None
+
+
+class FeedbackResponse(BaseModel):
+    id: int
+    conversation_id: str
+    chat_log_id: int
+    user_id: str
+    rating: int
+    feedback_type: str
+    comment: str | None = None
     created_at: str

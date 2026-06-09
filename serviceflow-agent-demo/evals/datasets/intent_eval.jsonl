@@ -1,0 +1,40 @@
+{"id":"intent_001","tenant_id":"T1001","input":"帮我查一下订单 10001 到哪里了","expected_intent":"ORDER_QUERY"}
+{"id":"intent_002","tenant_id":"T1001","input":"订单 10002 发货了吗","expected_intent":"ORDER_QUERY"}
+{"id":"intent_003","tenant_id":"T1001","input":"快递现在到哪里了，订单号 10003","expected_intent":"ORDER_QUERY"}
+{"id":"intent_004","tenant_id":"T1001","input":"查询订单 10001 物流","expected_intent":"ORDER_QUERY"}
+{"id":"intent_005","tenant_id":"T1001","input":"我要退货，订单号 10001","expected_intent":"RETURN_REQUEST"}
+{"id":"intent_006","tenant_id":"T1001","input":"这个商品不想要了","expected_intent":"RETURN_REQUEST"}
+{"id":"intent_007","tenant_id":"T1001","input":"申请售后退掉","expected_intent":"RETURN_REQUEST"}
+{"id":"intent_008","tenant_id":"T1001","input":"我要退款退货","expected_intent":"RETURN_REQUEST"}
+{"id":"intent_009","tenant_id":"T1001","input":"查一下退货单 R202606010001","expected_intent":"REFUND_STATUS"}
+{"id":"intent_010","tenant_id":"T1001","input":"退货进度怎么看","expected_intent":"REFUND_STATUS"}
+{"id":"intent_011","tenant_id":"T1001","input":"退款状态是什么","expected_intent":"REFUND_STATUS"}
+{"id":"intent_012","tenant_id":"T1001","input":"return_id R202606010002","expected_intent":"REFUND_STATUS"}
+{"id":"intent_013","tenant_id":"T1001","input":"路由器无法连接 WiFi 怎么办","expected_intent":"TECH_SUPPORT"}
+{"id":"intent_014","tenant_id":"T1001","input":"设备搜不到怎么办","expected_intent":"TECH_SUPPORT"}
+{"id":"intent_015","tenant_id":"T1001","input":"App 配网报错","expected_intent":"TECH_SUPPORT"}
+{"id":"intent_016","tenant_id":"T1001","input":"安装时一直联网失败","expected_intent":"TECH_SUPPORT"}
+{"id":"intent_017","tenant_id":"T1001","input":"7 天无理由退货规则是什么","expected_intent":"POLICY_QA"}
+{"id":"intent_018","tenant_id":"T1001","input":"售后政策怎么规定","expected_intent":"POLICY_QA"}
+{"id":"intent_019","tenant_id":"T1001","input":"保修多久","expected_intent":"POLICY_QA"}
+{"id":"intent_020","tenant_id":"T1001","input":"延保服务支持吗","expected_intent":"POLICY_QA"}
+{"id":"intent_021","tenant_id":"T1001","input":"SmartRouter X1 支持 macOS 吗","expected_intent":"PRODUCT_QA"}
+{"id":"intent_022","tenant_id":"T1001","input":"产品参数是什么","expected_intent":"PRODUCT_QA"}
+{"id":"intent_023","tenant_id":"T1001","input":"SmartCamera C2 支持 5G WiFi 吗","expected_intent":"PRODUCT_QA"}
+{"id":"intent_024","tenant_id":"T1001","input":"这个产品规格有哪些","expected_intent":"PRODUCT_QA"}
+{"id":"intent_025","tenant_id":"T1001","input":"我要投诉","expected_intent":"COMPLAINT"}
+{"id":"intent_026","tenant_id":"T1001","input":"你们服务太差我要差评","expected_intent":"COMPLAINT"}
+{"id":"intent_027","tenant_id":"T1001","input":"我很生气要投诉","expected_intent":"COMPLAINT"}
+{"id":"intent_028","tenant_id":"T1001","input":"我要举报这个问题","expected_intent":"UNKNOWN"}
+{"id":"intent_029","tenant_id":"T1001","input":"找人工客服","expected_intent":"HUMAN_TRANSFER"}
+{"id":"intent_030","tenant_id":"T1001","input":"转人工","expected_intent":"HUMAN_TRANSFER"}
+{"id":"intent_031","tenant_id":"T1001","input":"我要找客服","expected_intent":"HUMAN_TRANSFER"}
+{"id":"intent_032","tenant_id":"T1001","input":"人工在吗","expected_intent":"HUMAN_TRANSFER"}
+{"id":"intent_033","tenant_id":"T1001","input":"今天有什么推荐","expected_intent":"UNKNOWN"}
+{"id":"intent_034","tenant_id":"T1001","input":"你好","expected_intent":"UNKNOWN"}
+{"id":"intent_035","tenant_id":"T1001","input":"天气怎么样","expected_intent":"UNKNOWN"}
+{"id":"intent_036","tenant_id":"T1001","input":"给我讲个笑话","expected_intent":"UNKNOWN"}
+{"id":"intent_037","tenant_id":"T1001","input":"订单 10001 可以退货吗","expected_intent":"RETURN_REQUEST"}
+{"id":"intent_038","tenant_id":"T1001","input":"路由器安装配置方法","expected_intent":"TECH_SUPPORT"}
+{"id":"intent_039","tenant_id":"T1001","input":"摄像头产品支持什么 App","expected_intent":"PRODUCT_QA"}
+{"id":"intent_040","tenant_id":"T1001","input":"超过 7 天还能无理由退货吗","expected_intent":"POLICY_QA"}

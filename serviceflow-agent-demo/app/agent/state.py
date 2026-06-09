@@ -2,10 +2,15 @@ from typing import Any, TypedDict
 
 
 class AgentState(TypedDict, total=False):
+    trace_id: str
+    tenant_id: str
     conversation_id: str | None
     user_message: str
     user_id: str
     current_intent: str | None
+    conversation_status: str
+    handoff_status: str
+    assigned_agent_id: str | None
     pending_action: str
     slots: dict[str, Any]
     missing_slots: list[str]
@@ -23,6 +28,7 @@ class AgentState(TypedDict, total=False):
     citations: list[dict[str, Any]]
     evaluation_result: dict[str, Any]
     final_answer: str
+    sender: str
     need_human: bool
     ticket_id: str | None
     order_info: dict[str, Any] | None

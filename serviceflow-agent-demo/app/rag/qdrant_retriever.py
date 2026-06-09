@@ -5,9 +5,9 @@ import uuid
 from dataclasses import asdict
 from time import sleep
 from typing import Any
-from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
+
+import httpx
 
 from app.config import settings
 from app.rag.embeddings import HashEmbedding
@@ -19,34 +19,33 @@ class QdrantUnavailable(RuntimeError):
 
 
 class QdrantRestClient:
-    """Qdrant REST 客户端，避免 Demo 依赖额外 HTTP/gRPC 栈细节。"""
+    """Qdrant REST 客户端，使用 httpx 复用连接并统一超时错误。"""
 
-    def __init__(self, url: str | None = None, api_key: str | None = None, timeout: float = 2.0):
+    def __init__(self, url: str | None = None, api_key: str | None = None, timeout: float | None = None, client: httpx.Client | None = None):
         self.url = (url or settings.qdrant_url).rstrip("/")
         self.api_key = api_key or settings.qdrant_api_key
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else settings.qdrant_timeout_seconds
+        self.client = client or httpx.Client(timeout=self.timeout)
 
     def request(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
-        data = json.dumps(body).encode("utf-8") if body is not None else None
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["api-key"] = self.api_key
-        request = Request(f"{self.url}{path}", data=data, method=method, headers=headers)
         try:
-            with urlopen(request, timeout=self.timeout) as response:
-                raw = response.read().decode("utf-8")
-                return json.loads(raw) if raw else {}
-        except HTTPError as exc:
-            if exc.code == 404:
+            response = self.client.request(method, f"{self.url}{path}", json=body, headers=headers)
+            if response.status_code == 404:
                 return {"status": "not_found"}
-            raise QdrantUnavailable(f"Qdrant HTTP {exc.code}: {exc.read().decode('utf-8', errors='ignore')}") from exc
-        except (URLError, TimeoutError) as exc:
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except httpx.HTTPStatusError as exc:
+            raise QdrantUnavailable(f"Qdrant HTTP {exc.response.status_code}: {exc.response.text}") from exc
+        except httpx.HTTPError as exc:
             raise QdrantUnavailable(str(exc)) from exc
 
 
 class QdrantRetriever:
     def __init__(self, client: QdrantRestClient | None = None, embedder: HashEmbedding | None = None):
-        self.client = client or QdrantRestClient(timeout=1.5)
+        self.client = client or QdrantRestClient()
         self.embedder = embedder or HashEmbedding()
         self.collection_name = settings.qdrant_collection
 

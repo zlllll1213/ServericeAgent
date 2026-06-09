@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.agent.intents import Intent
 from app.config import settings
 from app.rag.qdrant_retriever import QdrantRetriever, QdrantUnavailable
 from app.rag.retriever import SimpleRetriever
@@ -8,9 +9,9 @@ from app.rag.retriever import SimpleRetriever
 RetrieverUnavailable = QdrantUnavailable
 
 INTENT_KB = {
-    "TECH_SUPPORT": "tech",
-    "POLICY_QA": "policy",
-    "PRODUCT_QA": "product",
+    Intent.TECH_SUPPORT.value: "tech",
+    Intent.POLICY_QA.value: "policy",
+    Intent.PRODUCT_QA.value: "product",
 }
 
 
@@ -19,7 +20,7 @@ def metadata_filter_for_intent(intent: str, query: str) -> dict[str, Any]:
     filters: dict[str, Any] = {"knowledge_base": INTENT_KB.get(intent)}
     product_name = product_name_from_query(query)
     # 对明确产品的问题追加产品过滤，提升 Qdrant 命中的可解释性。
-    if product_name and intent in {"PRODUCT_QA", "TECH_SUPPORT"}:
+    if product_name and intent in {Intent.PRODUCT_QA.value, Intent.TECH_SUPPORT.value}:
         filters["product_name"] = product_name
     return {key: value for key, value in filters.items() if value}
 

@@ -1,0 +1,511 @@
+# 开发阶段记录
+
+## 第一阶段：ServiceFlow Agent Demo
+
+- 搭建 FastAPI 后端服务。
+- 实现 `GET /` 聊天页面入口。
+- 实现 `POST /api/chat` Agent 对话接口。
+- 实现 `GET /api/orders/{order_id}` 订单查询接口。
+- 实现 `GET /api/tickets` 人工工单列表接口。
+- 实现 `GET /api/returns` 退货申请列表接口。
+- 使用 LangGraph 搭建客服 Agent 工作流。
+- 实现输入解析节点 `parse_input_node`。
+- 实现意图识别节点 `intent_router_node`。
+- 实现路由决策逻辑 `route_decision`。
+- 实现订单查询节点 `order_query_node`。
+- 实现退货申请节点 `return_request_node`。
+- 实现退款/退货状态查询节点 `refund_status_node`。
+- 实现技术知识库问答节点 `rag_tech_node`。
+- 实现售后政策问答节点 `rag_policy_node`。
+- 实现产品知识库问答节点 `rag_product_node`。
+- 实现投诉和转人工工单节点 `human_ticket_node`。
+- 实现未知意图追问节点 `clarify_node`。
+- 实现统一响应整理节点 `final_response_node`。
+- 定义 Agent 状态字段：`user_message`、`intent`、`confidence`、`extracted_slots`、`route_trace`、`tool_calls`、`retrieved_docs`、`final_answer`、`need_human`、`ticket_id`、`order_info`、`return_result`。
+- 实现规则意图识别：订单查询、退货申请、退款状态、技术咨询、售后政策、产品咨询、投诉、转人工、未知意图。
+- 搭建 SQLite 数据库。
+- 创建订单表 `orders`。
+- 创建退货申请表 `return_requests`。
+- 创建人工工单表 `tickets`。
+- 编写数据库初始化脚本 `app/seed.py`。
+- 初始化订单数据：`10001`、`10002`、`10003`。
+- 实现业务工具 `get_order_status`。
+- 实现业务工具 `create_return_request`。
+- 实现业务工具 `get_refund_status`。
+- 实现业务工具 `create_ticket`。
+- 实现工具调用记录 `tool_calls`。
+- 创建本地 Markdown 知识库目录。
+- 编写技术知识库文档。
+- 编写售后政策知识库文档。
+- 编写产品知识库文档。
+- 实现 `SimpleRetriever`。
+- 实现按知识库类型检索：`tech`、`policy`、`product`。
+- 预留 `VectorRetriever` 接口。
+- 搭建原生 HTML / CSS / JavaScript 聊天页面。
+- 实现左侧聊天窗口。
+- 实现右侧 Agent 调试面板。
+- 在调试面板展示 intent、confidence、route_trace、tool_calls、retrieved_docs、ticket_id。
+- 添加内置测试按钮：查订单、退货、WiFi、7 天退货规则、macOS、投诉转人工。
+- 编写 README，包含项目简介、架构图、启动方式、测试问题、API 示例和后续扩展方向。
+- 编写 pytest 测试，覆盖订单查询、退货成功、退货过期、知识库问答、投诉工单和未知意图。
+- 完成第一阶段本地验证，测试结果为 `6 passed`。
+- 将第一阶段代码提交并推送到 GitHub 仓库 `zlllll1213/ServericeAgent`。
+
+## 第二阶段：Qdrant 知识库增强
+
+- 将知识库检索主路径升级为 `QdrantRetriever`。
+- 保留 `SimpleRetriever` 作为 fallback。
+- 新增 Qdrant Docker Compose 配置。
+- 新增 Qdrant 环境变量配置：`QDRANT_URL`、`QDRANT_API_KEY`、`QDRANT_COLLECTION`、`QDRANT_VECTOR_SIZE`、`QDRANT_ENABLED`。
+- 新增本地 hash embedding，用于无外部 embedding 服务时的 Qdrant Demo 向量化。
+- 新增 Qdrant REST 客户端。
+- 新增 Qdrant collection 创建逻辑。
+- 新增 Qdrant readiness retry 逻辑。
+- 新增知识库 chunk 切分逻辑。
+- 新增知识库索引脚本 `python -m app.rag.index_qdrant`。
+- 将 tech、policy、product 三类知识库写入 Qdrant。
+- 为每条文档 chunk 添加 metadata：`knowledge_base`。
+- 为每条文档 chunk 添加 metadata：`source_file`。
+- 为每条文档 chunk 添加 metadata：`product_name`。
+- 为每条文档 chunk 添加 metadata：`category`。
+- 实现根据 intent 自动生成 metadata filter。
+- 实现 `TECH_SUPPORT -> knowledge_base = tech` 过滤。
+- 实现 `POLICY_QA -> knowledge_base = policy` 过滤。
+- 实现 `PRODUCT_QA -> knowledge_base = product` 过滤。
+- 实现根据问题识别产品名并追加 `product_name` filter。
+- 将 RAG 节点改为通过统一 `retrieve_documents` 服务检索。
+- 实现 Qdrant 不可用时自动回退到 `SimpleRetriever`。
+- 在检索结果中标记 `retriever` 来源。
+- 在检索结果中返回命中的知识库。
+- 在检索结果中返回文档来源文件。
+- 在检索结果中返回相似度分数。
+- 在检索结果中返回产品名和分类。
+- 优化前端调试面板，新增 `Knowledge Hits`。
+- 在 `Knowledge Hits` 展示知识库名称。
+- 在 `Knowledge Hits` 展示来源文件。
+- 在 `Knowledge Hits` 展示相似度分数。
+- 在 `Knowledge Hits` 展示 retriever 类型。
+- 优化前端布局为更清晰的 Agent 控制台。
+- 增加当前决策摘要展示。
+- 增加检索状态展示。
+- 增加发送中状态。
+- 修复聊天区域高度过小的问题。
+- 修复移动端标题和面板内容横向溢出问题。
+- 为核心代码补充中文注释。
+- 新增 `AGENTS.md`，记录后续代码适当加入中文注释的项目协作约定。
+- 使用 GSAP 和 ScrollTrigger 为前端增加轻量状态动效。
+- 将 GSAP 和 ScrollTrigger vendor 到本地静态目录。
+- 实现 GSAP 本地 fallback loader。
+- 支持 `prefers-reduced-motion` 降级。
+- 更新 README，补充 Qdrant Docker Compose 启动方式。
+- 更新 README，补充 Qdrant 索引方式。
+- 更新 README，补充 metadata 和 filter 说明。
+- 扩展 pytest 测试，覆盖 Qdrant filter 和 fallback 行为。
+- 完成第二阶段本地验证，测试结果为 `8 passed`。
+- 完成真实 Qdrant 索引验证，成功索引 6 个知识库 chunk。
+
+## 第三阶段：真实 Agent 能力增强
+
+- 新增 OpenAI-compatible LLM 配置：`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`。
+- 新增 `app/llm/client.py`，封装 Chat Completions 调用。
+- 支持 LLM JSON 输出解析。
+- 支持 LLM 不可用或未配置 API Key 时自动 fallback 到规则逻辑。
+- 新增 `app/llm/prompts.py`，集中管理所有 Prompt 模板。
+- 新增意图识别 Prompt。
+- 新增槽位抽取 Prompt。
+- 新增 RAG 回答生成 Prompt。
+- 新增工具调用确认 Prompt。
+- 新增人工客服摘要 Prompt。
+- 新增回答质量评估 Prompt。
+- 将 Prompt 从业务逻辑中抽离，避免散落在节点代码里。
+- 将规则意图识别升级为规则路由 + LLM 路由 + 置信度融合。
+- 新增 `classify_intent_hybrid` 混合路由逻辑。
+- 新增 LLM 路由结果解析和异常 fallback。
+- 新增规则与 LLM 结果一致时的置信度提升逻辑。
+- 新增规则与 LLM 结果冲突时的 conflict 记录。
+- 新增严重冲突时进入澄清流程的逻辑。
+- 新增 `route_debug` 字段。
+- 在 `route_debug` 中记录 `rule_result`。
+- 在 `route_debug` 中记录 `llm_result`。
+- 在 `route_debug` 中记录 `final_intent`。
+- 在 `route_debug` 中记录 `conflict`。
+- 在 `route_debug` 中记录 `decision_reason`。
+- 新增会话表 `conversations`。
+- 新增会话字段：`conversation_id`、`user_id`、`current_intent`、`pending_action`、`slots`、`history`、`status`、`created_at`、`updated_at`。
+- 新增 `app/agent/persistence.py`，封装会话创建、加载、保存、重置和日志查询。
+- 支持 `/api/chat` 请求传入 `conversation_id`。
+- 支持前端不传 `conversation_id` 时自动创建会话。
+- 扩展 Agent State，新增 `conversation_id`。
+- 扩展 Agent State，新增 `current_intent`。
+- 扩展 Agent State，新增 `pending_action`。
+- 扩展 Agent State，新增 `slots`。
+- 扩展 Agent State，新增 `missing_slots`。
+- 扩展 Agent State，新增 `history`。
+- 扩展 Agent State，新增 `awaiting_user_input`。
+- 扩展 Agent State，新增 `route_debug`。
+- 扩展 Agent State，新增 `citations`。
+- 扩展 Agent State，新增 `evaluation_result`。
+- 重构 LangGraph 工作流，新增 `load_conversation_node`。
+- 重构 LangGraph 工作流，增强 `parse_input_node`，支持订单号、退货单号、退货原因、确认和取消意图解析。
+- 重构 LangGraph 工作流，增强 `intent_router_node`，支持混合路由和多轮意图续接。
+- 重构 LangGraph 工作流，新增 `slot_filling_node`。
+- 重构 LangGraph 工作流，新增 `confirm_node`。
+- 重构 LangGraph 工作流，新增 `tool_execute_node`。
+- 重构 LangGraph 工作流，统一 `rag_node`。
+- 重构 LangGraph 工作流，增强 `human_ticket_node`。
+- 重构 LangGraph 工作流，新增 `evaluation_node`。
+- 重构 LangGraph 工作流，新增 `save_conversation_node`。
+- 将原退货单轮直执行流程改为多轮槽位补全流程。
+- 实现 `RETURN_REQUEST` 必填槽位 `order_id`。
+- 实现 `RETURN_REQUEST` 必填槽位 `return_reason`。
+- 支持用户第一轮说“我要退货”时追问订单号。
+- 支持用户第二轮只回复 `10001` 时继续退货流程。
+- 支持用户补充退货原因后进入确认流程。
+- 支持会话中短句退货原因识别，例如“买错了”。
+- 新增 `pending_action=CREATE_RETURN_REQUEST`。
+- 新增 `pending_action=CREATE_TICKET`。
+- 新增 `pending_action=NONE`。
+- 对 `create_return_request` 增加工具调用前确认机制。
+- 对 `create_ticket` 增加工单创建前的结构化摘要逻辑。
+- 支持确认词：`确认`、`是的`、`可以`、`提交`、`帮我创建`。
+- 支持取消词：`取消`、`算了`、`不用了`、`先不退了`。
+- 确认后才调用 `create_return_request`。
+- 取消后不创建 `return_requests` 记录。
+- 在 `route_trace` 中展示 `slot_filling_node`。
+- 在 `route_trace` 中展示 `confirm_node`。
+- 在 `route_trace` 中展示 `tool_execute_node`。
+- 增强 RAG 回答生成。
+- RAG 检索仍然根据 intent 自动选择知识库：`TECH_SUPPORT -> tech`。
+- RAG 检索仍然根据 intent 自动选择知识库：`POLICY_QA -> policy`。
+- RAG 检索仍然根据 intent 自动选择知识库：`PRODUCT_QA -> product`。
+- RAG 回答必须基于 `retrieved_docs`。
+- RAG 无检索结果时回复“暂未找到相关资料”并建议转人工。
+- 新增 RAG `citations` 返回结构。
+- 在 citations 中返回 `source_file`。
+- 在 citations 中返回 `chunk_id`。
+- 在 citations 中返回 `score`。
+- 为 `SimpleRetriever` 检索结果补充 `chunk_id`。
+- 为 `QdrantRetriever` 检索结果补充 `chunk_id`。
+- 增强人工客服工单摘要。
+- 支持 LLM 生成客服摘要。
+- 支持 LLM 不可用时使用模板摘要。
+- 工单摘要返回 `summary`。
+- 工单摘要返回 `priority`。
+- 工单摘要返回 `issue_type`。
+- 工单摘要返回 `suggested_action`。
+- 实现投诉、差评、举报、人工等高风险关键词的 HIGH 优先级规则。
+- 修改 `create_ticket` 工具，支持传入 priority。
+- 修改 `create_ticket` 工具，返回 summary 和 issue_type。
+- 新增 `app/evaluation/evaluator.py` 回答质量评估模块。
+- 支持 LLM-as-judge 评估。
+- 支持 LLM 不可用时规则评估。
+- 评估维度包含 `intent_correctness`。
+- 评估维度包含 `answer_relevance`。
+- 评估维度包含 `tool_call_correctness`。
+- 评估维度包含 `citation_quality`。
+- 评估维度包含 `safety_risk`。
+- 评估维度包含 `need_human_review`。
+- 新增审计日志表 `chat_logs`。
+- 在 `chat_logs` 中记录 `conversation_id`。
+- 在 `chat_logs` 中记录 `user_message`。
+- 在 `chat_logs` 中记录 `final_answer`。
+- 在 `chat_logs` 中记录 `intent`。
+- 在 `chat_logs` 中记录 `confidence`。
+- 在 `chat_logs` 中记录 `route_trace`。
+- 在 `chat_logs` 中记录 `tool_calls`。
+- 在 `chat_logs` 中记录 `retrieved_docs`。
+- 在 `chat_logs` 中记录 `citations`。
+- 在 `chat_logs` 中记录 `evaluation_result`。
+- 每次 `/api/chat` 请求都会写入审计日志。
+- 新增 `GET /api/conversations/{conversation_id}` 会话状态接口。
+- 新增 `GET /api/conversations/{conversation_id}/logs` 会话日志接口。
+- 新增 `POST /api/conversations/{conversation_id}/reset` 会话重置接口。
+- 更新 Pydantic Schema，约束新的 chat request 和 response 字段。
+- 更新 Pydantic Schema，新增 `ConversationResponse`。
+- 更新 Pydantic Schema，新增 `ChatLogResponse`。
+- 更新前端 Web Chat 页面，展示 `conversation_id`。
+- 更新前端 Web Chat 页面，支持多轮对话复用同一个 `conversation_id`。
+- 更新前端调试面板，展示 `slots`。
+- 更新前端调试面板，展示 `missing_slots`。
+- 更新前端调试面板，展示 `pending_action`。
+- 更新前端调试面板，展示 `route_debug`。
+- 更新前端调试面板，展示 `citations`。
+- 更新前端调试面板，展示 `evaluation_result`。
+- 新增前端测试按钮：“我要退货”。
+- 新增前端测试按钮：“10001”。
+- 新增前端测试按钮：“买错了”。
+- 新增前端测试按钮：“确认”。
+- 新增前端测试按钮：“取消”。
+- 聊天消息中区分用户消息。
+- 聊天消息中区分 Agent 回复。
+- 聊天消息中区分系统确认提示。
+- 聊天消息中区分工具执行结果。
+- 更新 README，补充 V0.3 更新内容。
+- 更新 README，补充多轮对话流程说明。
+- 更新 README，补充工具调用前确认机制说明。
+- 更新 README，补充 LLM 配置说明。
+- 更新 README，补充没有 API Key 时的 fallback 说明。
+- 更新 README，补充新工作流架构图。
+- 更新 README，补充多轮测试用例。
+- 更新 README，补充回答质量评估说明。
+- 更新 README，补充 V0.4 规划。
+- 将 README 复制到仓库根目录，支持 GitHub 仓库首页直接预览。
+- 将 README 架构图从 `text` 代码块改为 GitHub 可渲染的 Mermaid 图。
+- 更新 `.gitignore`，忽略本地 Agent 配置文件和 reasoning 工具配置。
+- 忽略 `.codegraph/`。
+- 忽略 `AGENTS.md`。
+- 忽略 `Agent.md`。
+- 忽略 `agent.md`。
+- 忽略 `reasonix.toml`。
+- 扩展 pytest 测试，覆盖多轮退货申请。
+- 扩展 pytest 测试，覆盖取消退货申请。
+- 扩展 pytest 测试，覆盖退货过期订单确认前拦截。
+- 扩展 pytest 测试，覆盖 RAG citations。
+- 扩展 pytest 测试，覆盖技术咨询 citations。
+- 扩展 pytest 测试，覆盖人工客服工单摘要和优先级。
+- 扩展 pytest 测试，覆盖会话日志审计接口。
+- 完成第三阶段本地验证，测试结果为 `10 passed`。
+- 完成 Python 编译检查，`python -m compileall app main.py` 通过。
+- 完成前端浏览器验证，多轮退货按钮流正常。
+- 完成前端浏览器验证，RAG citations 正常展示。
+- 完成前端浏览器验证，桌面和移动首屏渲染正常。
+- 完成第三阶段代码提交并推送到 GitHub 仓库 `zlllll1213/ServericeAgent`。
+
+## 第四阶段：客服后台管理能力增强
+
+- 新增简单角色设计：`customer`、`agent`、`admin`。
+- 支持 `/admin?role=agent` 模拟人工客服角色。
+- 支持 `/admin?role=admin` 模拟管理员角色。
+- 扩展 `conversations` 表，新增 `assigned_agent_id`。
+- 扩展 `conversations` 表，新增 `handoff_status`。
+- 扩展 `tickets` 表，新增 `assigned_agent_id`。
+- 扩展 `tickets` 表，新增 `resolution`。
+- 扩展 `tickets` 表，新增 `updated_at`。
+- 扩展 `chat_logs` 表，新增 `sender`。
+- 新增 `knowledge_documents` 知识库文档管理表。
+- 新增 `agent_feedback` Agent 回答反馈表。
+- 新增 `admin_users` 简单后台用户表。
+- 初始化后台用户 `A1001 / admin / admin`。
+- 初始化后台用户 `S1001 / service_agent / agent`。
+- 新增轻量 SQLite schema migration，兼容已有演示数据库自动补列。
+- 新增会话管理 API：`GET /api/admin/conversations`。
+- 新增会话详情 API：`GET /api/admin/conversations/{conversation_id}`。
+- 新增会话认领 API：`POST /api/admin/conversations/{conversation_id}/assign`。
+- 新增人工客服回复 API：`POST /api/admin/conversations/{conversation_id}/reply`。
+- 新增会话关闭 API：`POST /api/admin/conversations/{conversation_id}/resolve`。
+- 新增工单列表 API：`GET /api/admin/tickets`。
+- 新增工单详情 API：`GET /api/admin/tickets/{ticket_id}`。
+- 新增工单认领 API：`POST /api/admin/tickets/{ticket_id}/assign`。
+- 新增工单处理 API：`POST /api/admin/tickets/{ticket_id}/resolve`。
+- 新增工单关闭 API：`POST /api/admin/tickets/{ticket_id}/close`。
+- 新增知识库文档列表 API：`GET /api/admin/knowledge-documents`。
+- 新增知识库文档创建 API：`POST /api/admin/knowledge-documents`。
+- 新增知识库文档更新 API：`PUT /api/admin/knowledge-documents/{doc_id}`。
+- 新增知识库文档发布 API：`POST /api/admin/knowledge-documents/{doc_id}/publish`。
+- 新增知识库文档归档 API：`POST /api/admin/knowledge-documents/{doc_id}/archive`。
+- 新增知识库重建索引 API：`POST /api/admin/knowledge-documents/reindex`。
+- 新增回答反馈 API：`POST /api/feedback`。
+- 新增后台反馈列表 API：`GET /api/admin/feedback`。
+- 新增质量统计 API：`GET /api/admin/evaluation-summary`。
+- 新增后台 Agent 日志 API：`GET /api/admin/chat-logs`。
+- 修改 Agent 工作流，支持 `HUMAN_HANDLING` 状态下跳过自动回复。
+- 新增 `human_handoff_node`，人工接管期间只记录消息并返回等待提示。
+- 当 Agent 判断需要人工介入时，将会话状态改为 `WAITING_HUMAN`。
+- 当 Agent 判断需要人工介入时，将 `handoff_status` 改为 `REQUESTED`。
+- 客服认领会话后，将会话状态改为 `HUMAN_HANDLING`。
+- 客服认领会话后，将 `handoff_status` 改为 `ASSIGNED`。
+- 客服回复写入 `conversation.history`。
+- 客服回复写入 `chat_logs`。
+- 客服回复的 `sender` 标记为 `human_agent`。
+- 会话关闭后，将状态改为 `CLOSED`。
+- 会话关闭后，将 `handoff_status` 改为 `RESOLVED`。
+- 用户对已关闭会话继续发消息时，第一版自动重新激活会话。
+- 新增 `/admin` 后台页面。
+- 后台页面新增左侧导航栏。
+- 后台页面新增会话列表视图。
+- 后台页面新增会话详情视图。
+- 后台页面支持会话认领。
+- 后台页面支持人工回复。
+- 后台页面支持关闭会话。
+- 后台页面新增工单管理视图。
+- 后台页面支持工单认领。
+- 后台页面支持工单处理。
+- 后台页面支持工单关闭。
+- 后台页面新增知识库管理视图。
+- 后台页面支持新建知识库文档。
+- 后台页面支持发布知识库文档。
+- 后台页面支持归档知识库文档。
+- 后台页面支持重建知识库索引。
+- 后台页面新增 Agent 日志视图。
+- 后台页面新增质量反馈视图。
+- 后台质量反馈视图展示 `evaluation-summary` 统计。
+- 普通聊天页面新增“转人工客服”按钮。
+- 普通聊天页面新增回答反馈按钮。
+- 普通聊天页面支持 👍 有帮助。
+- 普通聊天页面支持 👎 没帮助。
+- 普通聊天页面支持差评原因选择。
+- 普通聊天页面轮询当前会话 history。
+- 普通聊天页面可展示人工客服回复。
+- 知识库发布时写入本地 `knowledge_base/{type}/{doc_id}.md`。
+- 知识库发布后尝试重建 Qdrant 索引。
+- Qdrant 不可用时保留 SimpleRetriever fallback。
+- 将“延保”纳入政策问答意图识别关键词。
+- 扩展 pytest 测试，覆盖人工转接流程。
+- 扩展 pytest 测试，覆盖客服认领会话。
+- 扩展 pytest 测试，覆盖客服回复。
+- 扩展 pytest 测试，覆盖会话关闭。
+- 扩展 pytest 测试，覆盖工单认领、处理和关闭。
+- 扩展 pytest 测试，覆盖知识库新增、发布和检索引用。
+- 扩展 pytest 测试，覆盖用户反馈和质量统计。
+- 更新根目录 README，补充 V0.4 后台管理说明。
+- 更新 demo README，补充 V0.4 后台管理说明。
+- 完成第四阶段本地验证，测试结果为 `14 passed`。
+- 完成 Python 编译检查，`python -m compileall app main.py` 通过。
+
+## 第五阶段：安全与接口治理增强
+
+- 新增轻量认证模块 `app/auth.py`。
+- 支持后台用户通过 `POST /api/auth/login` 登录。
+- 支持通过 `GET /api/auth/me` 读取当前登录用户。
+- 实现基于 HMAC 签名的 Demo token。
+- 实现 token 过期时间校验。
+- 支持后台 API 使用 `Authorization: Bearer <token>` 访问。
+- 保留 `X-User-Role` 请求头作为显式开启的本地演示 fallback。
+- 新增后台访问鉴权中间件。
+- 未携带后台认证信息访问 `/api/admin/*` 时返回 401。
+- 新增后台权限校验函数 `require_admin_access`。
+- 支持 `agent`、`admin`、`tenant_admin`、`super_admin` 角色进入后台接口。
+- 新增统一异常模块 `app/core/exceptions.py`。
+- 新增认证异常 `AuthException`。
+- 新增权限异常 `PermissionDeniedException`。
+- 新增统一 API 错误返回结构。
+- 统一错误返回包含 `error_code`。
+- 统一错误返回包含 `message`。
+- 统一错误返回包含 `request_id`。
+- 新增 `/api/health` 健康检查接口。
+- 健康检查返回数据库状态。
+- 健康检查返回 Qdrant fallback 状态。
+- 健康检查保留 Redis、MinIO 的 Demo 未配置状态。
+- 扩展 Agent State，新增 `tenant_id`。
+- 在 Qdrant filter 构造中支持 `tenant_id`。
+- 新增 tenant filter 契约测试。
+- 新增 RBAC Demo 契约测试。
+- 新增 Redis/限流健康契约测试。
+- 新增认证测试 `test_auth.py`。
+- 新增健康检查测试 `test_api_health.py`。
+- 更新 API 文档，补充 Auth API。
+- 更新 API 文档，补充后台接口认证方式。
+- 更新部署文档，补充本地 Demo 的依赖和启动说明。
+
+## 第六阶段：工程可信度增强
+
+- 新增统一异常模块 `app/core/exceptions.py`。
+- 新增 `ServiceFlowException` 及认证、权限、租户、工具、检索、LLM、校验异常类型。
+- 新增 API 统一错误返回结构：`error_code`、`message`、`request_id`。
+- 新增轻量认证模块 `app/auth.py`。
+- 支持 `POST /api/auth/login`。
+- 支持 `GET /api/auth/me`。
+- 后台 API 支持 `Authorization: Bearer <token>`。
+- 后台 API 保留显式开启的 `X-User-Role` Demo 请求头。
+- 新增 `/api/health` 健康检查接口。
+- 新增 `agent_traces` 表。
+- 扩展 `chat_logs` 表，新增 `trace_id`。
+- 扩展 Agent State，新增 `trace_id`。
+- 扩展 Agent State，新增 `tenant_id`。
+- 每次 `/api/chat` 请求生成独立 `trace_id`。
+- 为 LangGraph 每个节点增加 trace wrapper。
+- 节点执行前后记录输入、输出、耗时、成功状态和错误信息。
+- Trace 写入前对 `password`、`token`、`api_key` 等敏感字段脱敏。
+- `route_trace` 保持轻量节点名列表。
+- `agent_traces` 保存完整输入输出，便于调试。
+- 节点异常时写入 `error_message`。
+- 新增后台 Trace 列表 API：`GET /api/admin/traces`。
+- 新增后台 Trace 详情 API：`GET /api/admin/traces/{trace_id}`。
+- 新增 Metrics 概览 API：`GET /api/admin/metrics/overview`。
+- 新增 Metrics 7 日趋势 API：`GET /api/admin/metrics/daily`。
+- Metrics 统计今日对话数。
+- Metrics 统计平均响应时间。
+- Metrics 统计 P95 响应时间。
+- Metrics 统计意图分布。
+- Metrics 统计工具调用次数和成功率。
+- Metrics 统计 RAG 平均耗时。
+- Metrics 统计人工转接率。
+- Metrics 统计负反馈率。
+- Metrics 统计错误率。
+- 新增评测报告列表 API：`GET /api/admin/evaluation-reports`。
+- 新增最近评测报告 API：`GET /api/admin/evaluation-reports/latest`。
+- 新增评测报告下载 API：`GET /api/admin/evaluation-reports/{filename}/download`。
+- 后台页面新增 Agent Trace 菜单。
+- 后台 Agent Trace 页面展示 trace_id、conversation_id、node_name、success、latency_ms、created_at。
+- 后台 Agent Trace 页面支持点击 trace_id 查看完整链路。
+- 后台 Metrics 看板展示今日对话数、响应时间、P95、工具成功率、人工转接率、差评率和错误率。
+- 后台 Evaluation 报告页面展示最近一次评测 Markdown。
+- 后台 Evaluation 报告页面支持下载 Markdown 报告。
+- 工具函数返回结构升级为 `{success, data, error}`。
+- 工具函数保留原有顶层字段，兼容 Agent 现有节点逻辑。
+- 新增 `tests/` 分文件测试目录结构。
+- 新增 `tests/conftest.py` 测试 fixture。
+- 新增认证测试 `test_auth.py`。
+- 新增健康检查测试 `test_api_health.py`。
+- 新增订单查询测试 `test_chat_order.py`。
+- 新增多轮退货测试 `test_chat_return.py`。
+- 新增 RAG 测试 `test_chat_rag.py`。
+- 新增人工接管测试 `test_human_handoff.py`。
+- 新增工具函数测试 `test_tools.py`。
+- 新增 Retriever 测试 `test_retriever.py`。
+- 新增 Agent Trace 工作流测试 `test_agent_workflow.py`。
+- 新增知识库发布检索测试 `test_knowledge_upload.py`。
+- 新增 RBAC Demo 契约测试 `test_rbac.py`。
+- 新增 tenant filter 契约测试 `test_tenant_isolation.py`。
+- 新增 Redis/限流健康契约测试 `test_rate_limit.py`。
+- 对当前 SQLite 单体 Demo 尚未接入的完整多租户、完整 RBAC、Redis 限流测试保留 skip 标注。
+- 新增 `evals/datasets/intent_eval.jsonl`，包含 40 条意图评测样本。
+- 新增 `evals/datasets/rag_eval.jsonl`，包含 30 条 RAG 评测样本。
+- 新增 `evals/datasets/tool_eval.jsonl`，包含 20 条工具评测样本。
+- 新增 `evals/datasets/end_to_end_eval.jsonl`，包含 10 条端到端评测样本。
+- 新增 `evals/metrics.py`。
+- 新增 `evals/run_eval.py`。
+- 评测脚本支持 `--dataset intent`。
+- 评测脚本支持 `--dataset rag`。
+- 评测脚本支持 `--dataset tool`。
+- 评测脚本支持 `--dataset e2e`。
+- 评测脚本支持 `--all`。
+- 评测脚本控制台输出指标 JSON。
+- 评测脚本生成 `reports/eval_report_日期.md`。
+- 新增 `evals/report_template.md`。
+- 新增 `scripts/load_test.py`。
+- 压测脚本覆盖订单查询、技术 RAG、政策 RAG、人工转接和多轮退货。
+- 压测脚本输出 total_requests、success、failed、avg_latency_ms、p95_latency_ms、qps。
+- 压测脚本生成 `reports/load_test_report_日期.md`。
+- 新增根目录 `Makefile`。
+- 新增 Demo 目录 `Makefile`。
+- 新增 `make dev`。
+- 新增 `make test`。
+- 新增 `make eval`。
+- 新增 `make lint`。
+- 新增 `make format`。
+- 新增 `make coverage`。
+- 新增 `make docker-up`。
+- 新增 `make docker-down`。
+- 新增 `requirements-dev.txt`。
+- 新增 `pyproject.toml`。
+- 配置 ruff。
+- 配置 black。
+- 配置 pytest。
+- 配置 coverage。
+- 新增 GitHub Actions 配置 `.github/workflows/ci.yml`。
+- CI 执行 checkout。
+- CI 配置 Python 3.11。
+- CI 安装生产依赖和开发依赖。
+- CI 初始化演示数据库。
+- CI 执行 `make lint`。
+- CI 执行 `make test`。
+- CI 执行 `make eval`。
+- CI 上传 `reports/` 作为 artifact。
+- 新增 `docs/api.md`。
+- 新增 `docs/architecture.md`。
+- 新增 `docs/evaluation.md`。
+- 新增 `docs/deployment.md`。
+- 新增 `docs/testing.md`。
+- 更新根目录 README，补充 V0.6 功能、命令、测试、评测、Trace、Metrics、压测和 CI。
+- 更新 demo README，补充 V0.6 功能、命令、测试、评测、Trace、Metrics、压测和 CI。

@@ -21,9 +21,13 @@ const decisionTextEl = document.querySelector("#decision-text");
 const retrieverStatusEl = document.querySelector("#retriever-status");
 const clearDebug = document.querySelector("#clear-debug");
 const sendButton = document.querySelector("#send-button");
+const handoffButton = document.querySelector("#handoff-button");
+const feedbackType = document.querySelector("#feedback-type");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let gsapReady = false;
 let conversationId = null;
+let historyCursor = 0;
+let lastChatLogId = null;
 
 async function runLocalScript(src) {
   const response = await fetch(src);
@@ -100,6 +104,7 @@ function appendMessage(role, text) {
     assistant: "Agent",
     system: "System Confirm",
     tool: "Tool Result",
+    human: "Human Agent",
   }[role] || "Agent";
   const paragraph = document.createElement("p");
   paragraph.textContent = text;
@@ -200,6 +205,8 @@ async function sendMessage(message) {
     const data = await response.json();
     appendMessage(messageRoleForResponse(data), data.answer);
     updateDebug(data);
+    await syncConversationHistory(false);
+    await refreshLastChatLogId();
   } catch (error) {
     errorText.textContent = `请求失败：${error.message}`;
   } finally {
@@ -210,6 +217,34 @@ async function sendMessage(message) {
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   sendMessage(input.value);
+});
+
+handoffButton.addEventListener("click", () => {
+  sendMessage("我要找人工客服");
+});
+
+document.querySelectorAll("[data-feedback]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    if (!conversationId || !lastChatLogId) {
+      errorText.textContent = "请先发送一条问题后再反馈。";
+      return;
+    }
+    const isGood = button.dataset.feedback === "GOOD";
+    const type = isGood ? "GOOD" : feedbackType.value;
+    const response = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversation_id: conversationId,
+        chat_log_id: lastChatLogId,
+        user_id: "U1001",
+        rating: isGood ? 5 : 2,
+        feedback_type: type,
+        comment: isGood ? "用户认为回答有帮助" : "用户认为回答没有帮助",
+      }),
+    });
+    errorText.textContent = response.ok ? "反馈已提交。" : "反馈提交失败。";
+  });
 });
 
 document.querySelectorAll("[data-prompt]").forEach((button) => {
@@ -248,6 +283,36 @@ function messageRoleForResponse(data) {
   }
   return "assistant";
 }
+
+async function refreshLastChatLogId() {
+  if (!conversationId) return;
+  const response = await fetch(`/api/conversations/${conversationId}/logs`);
+  if (!response.ok) return;
+  const logs = await response.json();
+  lastChatLogId = logs.length ? logs[logs.length - 1].id : lastChatLogId;
+}
+
+async function syncConversationHistory(appendNew = true) {
+  if (!conversationId) return;
+  const response = await fetch(`/api/conversations/${conversationId}`);
+  if (!response.ok) return;
+  const conversation = await response.json();
+  const history = conversation.history || [];
+  if (!appendNew) {
+    historyCursor = history.length;
+    return;
+  }
+  for (const item of history.slice(historyCursor)) {
+    if (item.sender === "human_agent") {
+      appendMessage("human", item.content);
+    }
+  }
+  historyCursor = history.length;
+}
+
+setInterval(() => {
+  syncConversationHistory(true).catch(() => {});
+}, 3000);
 
 ensureMotionRuntime()
   .then(initMotion)

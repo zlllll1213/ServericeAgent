@@ -1,0 +1,30 @@
+{"id":"rag_001","tenant_id":"T1001","input":"SmartRouter X1 支持 macOS 吗？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["macOS","支持"]}
+{"id":"rag_002","tenant_id":"T1001","input":"SmartRouter X1 有哪些核心能力？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["SmartRouter","WiFi"]}
+{"id":"rag_003","tenant_id":"T1001","input":"SmartRouter X1 价格是多少？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["399"]}
+{"id":"rag_004","tenant_id":"T1001","input":"SmartRouter X1 支持 5G WiFi 吗？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["5G","WiFi"]}
+{"id":"rag_005","tenant_id":"T1001","input":"SmartRouter X1 适合什么场景？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["SmartRouter"]}
+{"id":"rag_006","tenant_id":"T1001","input":"SmartCamera C2 支持 5G WiFi 吗？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["2.4G","WiFi"]}
+{"id":"rag_007","tenant_id":"T1001","input":"SmartCamera C2 价格是多少？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["299"]}
+{"id":"rag_008","tenant_id":"T1001","input":"SmartCamera C2 有夜视吗？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["夜视"]}
+{"id":"rag_009","tenant_id":"T1001","input":"摄像头支持 iOS 吗？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["iOS"]}
+{"id":"rag_010","tenant_id":"T1001","input":"摄像头移动侦测怎么说？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["移动侦测"]}
+{"id":"rag_011","tenant_id":"T1001","input":"路由器无法连接 WiFi 怎么办？","expected_knowledge_base":"tech","expected_source_contains":"smart_router_wifi","must_contain":["WiFi"]}
+{"id":"rag_012","tenant_id":"T1001","input":"路由器搜不到 WiFi 怎么排查？","expected_knowledge_base":"tech","expected_source_contains":"smart_router_wifi","must_contain":["WiFi"]}
+{"id":"rag_013","tenant_id":"T1001","input":"SmartRouter X1 连接 WiFi 失败","expected_knowledge_base":"tech","expected_source_contains":"smart_router_wifi","must_contain":["SmartRouter","WiFi"]}
+{"id":"rag_014","tenant_id":"T1001","input":"App 配网失败怎么办？","expected_knowledge_base":"tech","expected_source_contains":"app_pairing","must_contain":["App"]}
+{"id":"rag_015","tenant_id":"T1001","input":"设备绑定失败怎么处理？","expected_knowledge_base":"tech","expected_source_contains":"app_pairing","must_contain":["绑定"]}
+{"id":"rag_016","tenant_id":"T1001","input":"App 搜不到设备怎么办？","expected_knowledge_base":"tech","expected_source_contains":"app_pairing","must_contain":["设备"]}
+{"id":"rag_017","tenant_id":"T1001","input":"7 天无理由退货规则是什么？","expected_knowledge_base":"policy","expected_source_contains":"return_policy","must_contain":["7","退货"]}
+{"id":"rag_018","tenant_id":"T1001","input":"超过 7 天还能无理由退货吗？","expected_knowledge_base":"policy","expected_source_contains":"return_policy","must_contain":["超过","7"]}
+{"id":"rag_019","tenant_id":"T1001","input":"退货需要配件完整吗？","expected_knowledge_base":"policy","expected_source_contains":"return_policy","must_contain":["配件"]}
+{"id":"rag_020","tenant_id":"T1001","input":"哪些情况不支持无理由退货？","expected_knowledge_base":"policy","expected_source_contains":"return_policy","must_contain":["不支持"]}
+{"id":"rag_021","tenant_id":"T1001","input":"保修政策是什么？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["保修"]}
+{"id":"rag_022","tenant_id":"T1001","input":"SmartRouter X1 保修多久？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["12"]}
+{"id":"rag_023","tenant_id":"T1001","input":"进水损坏在保修范围吗？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["进水"]}
+{"id":"rag_024","tenant_id":"T1001","input":"无法开机可以保修吗？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["无法开机"]}
+{"id":"rag_025","tenant_id":"T1001","input":"保修申请需要什么证明？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["订单号"]}
+{"id":"rag_026","tenant_id":"T1001","input":"路由器网络模块故障怎么售后？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["网络模块"]}
+{"id":"rag_027","tenant_id":"T1001","input":"连接 WiFi 前要检查什么？","expected_knowledge_base":"tech","expected_source_contains":"smart_router_wifi","must_contain":["WiFi"]}
+{"id":"rag_028","tenant_id":"T1001","input":"ServiceFlow App 管理支持吗？","expected_knowledge_base":"product","expected_source_contains":"smart_router_x1","must_contain":["ServiceFlow"]}
+{"id":"rag_029","tenant_id":"T1001","input":"摄像头 1080p 吗？","expected_knowledge_base":"product","expected_source_contains":"smart_camera_c2","must_contain":["1080p"]}
+{"id":"rag_030","tenant_id":"T1001","input":"人为拆修还能保修吗？","expected_knowledge_base":"policy","expected_source_contains":"warranty_policy","must_contain":["拆修"]}

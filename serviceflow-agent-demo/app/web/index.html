@@ -53,7 +53,20 @@
               <button type="button" data-prompt="7 天无理由退货规则是什么">7 天退货规则</button>
               <button type="button" data-prompt="SmartRouter X1 支持 macOS 吗">macOS 支持</button>
               <button type="button" data-prompt="我要投诉，转人工客服">投诉转人工</button>
+              <button type="button" id="handoff-button">转人工客服</button>
             </div>
+          </div>
+
+          <div class="feedback-area" aria-label="回答反馈">
+            <span>回答反馈</span>
+            <button type="button" data-feedback="GOOD">👍 有帮助</button>
+            <button type="button" data-feedback="BAD_ANSWER">👎 没帮助</button>
+            <select id="feedback-type" aria-label="没帮助原因">
+              <option value="BAD_ANSWER">答非所问</option>
+              <option value="WRONG_TOOL">工具调用错误</option>
+              <option value="MISSING_CITATION">没有引用来源</option>
+              <option value="NEED_HUMAN">我想找人工客服</option>
+            </select>
           </div>
 
           <form id="chat-form" class="composer">

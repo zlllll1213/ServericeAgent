@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+from enum import StrEnum
+
+
+class Intent(StrEnum):
+    ORDER_QUERY = "ORDER_QUERY"
+    RETURN_REQUEST = "RETURN_REQUEST"
+    REFUND_STATUS = "REFUND_STATUS"
+    TECH_SUPPORT = "TECH_SUPPORT"
+    POLICY_QA = "POLICY_QA"
+    PRODUCT_QA = "PRODUCT_QA"
+    COMPLAINT = "COMPLAINT"
+    HUMAN_TRANSFER = "HUMAN_TRANSFER"
+    UNKNOWN = "UNKNOWN"
