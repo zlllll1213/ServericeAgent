@@ -41,15 +41,18 @@ def retrieve_documents(query: str, intent: str, top_k: int = 3) -> list[dict]:
     if settings.qdrant_enabled:
         try:
             # Qdrant 是主检索器；失败时不抛给用户，保持 Demo 离线可跑。
-            return QdrantRetriever().retrieve(
+            qdrant_docs = QdrantRetriever().retrieve(
                 query=query,
                 knowledge_base=knowledge_base,
                 top_k=top_k,
                 metadata_filter=filters,
             )
+            if qdrant_docs:
+                return qdrant_docs
         except QdrantUnavailable:
             pass
 
+    # Qdrant 可用但尚未索引时会返回空结果，此时继续用本地知识库兜底。
     docs = SimpleRetriever().retrieve(query=query, knowledge_base=knowledge_base, top_k=top_k)
     # 标记 fallback 来源，调试面板能看出当前走的是哪条检索路径。
     return [{**doc, "retriever": "simple_fallback"} for doc in docs]

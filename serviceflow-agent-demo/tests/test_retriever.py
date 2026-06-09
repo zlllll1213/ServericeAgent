@@ -24,3 +24,19 @@ def test_qdrant_filters_include_tenant_and_knowledge_base():
 
     keys = {item["key"] for item in qdrant_filter["must"]}
     assert {"knowledge_base", "product_name", "tenant_id"} <= keys
+
+
+def test_empty_qdrant_result_falls_back_to_simple_retriever(monkeypatch):
+    from app.rag import service
+
+    class EmptyQdrantRetriever:
+        def retrieve(self, *args, **kwargs):
+            return []
+
+    monkeypatch.setattr(service, "QdrantRetriever", lambda: EmptyQdrantRetriever())
+
+    docs = service.retrieve_documents("路由器怎么连接 WiFi", intent="TECH_SUPPORT", top_k=1)
+
+    assert docs
+    assert docs[0]["knowledge_base"] == "tech"
+    assert docs[0]["retriever"] == "simple_fallback"
