@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ServiceFlow Admin - 登录</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="login-shell">
+      <div class="login-card">
+        <p class="product-mark">ServiceFlow Admin</p>
+        <h1>客服后台登录</h1>
+
+        <form id="login-form">
+          <label class="sr-only" for="username">用户名</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            placeholder="用户名"
+            autocomplete="username"
+            required
+          />
+
+          <label class="sr-only" for="password">密码</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="密码"
+            autocomplete="current-password"
+            required
+          />
+
+          <label class="login-remember">
+            <input id="remember" type="checkbox" />
+            记住我
+          </label>
+
+          <button type="submit" id="login-button">登录</button>
+
+          <p id="login-error" class="error-text" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="login-hint">
+          演示账号：admin / admin123（管理员） | service_agent / agent123（坐席）
+        </p>
+      </div>
+    </main>
+
+    <script type="module">
+      import { apiLogin } from "/static/shared/api-client.js";
+      import { setToken } from "/static/shared/session-manager.js";
+
+      const form = document.querySelector("#login-form");
+      const errorEl = document.querySelector("#login-error");
+      const button = document.querySelector("#login-button");
+      const rememberCheck = document.querySelector("#remember");
+
+      // 如果已登录，直接跳转
+      const { getToken, isExpired } = await import("/static/shared/session-manager.js");
+      if (getToken() && !isExpired()) {
+        location.href = "/admin";
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const username = document.querySelector("#username").value.trim();
+        const password = document.querySelector("#password").value;
+        const remember = rememberCheck.checked;
+
+        if (!username || !password) {
+          errorEl.textContent = "请输入用户名和密码。";
+          return;
+        }
+
+        errorEl.textContent = "";
+        button.disabled = true;
+        button.textContent = "登录中…";
+
+        try {
+          // 后端登录接口使用 username（非 user_id）字段
+          const data = await apiLogin(username, password);
+          // 存储 token，remember 为 true 时使用 localStorage
+          setToken(data.access_token, data.role, data.user_id, remember);
+          // 登录成功跳转管理后台
+          location.href = "/admin";
+        } catch (error) {
+          errorEl.textContent = error.message || "登录失败，请检查用户名和密码。";
+          button.disabled = false;
+          button.textContent = "登录";
+        }
+      });
+    </script>
+  </body>
+</html>

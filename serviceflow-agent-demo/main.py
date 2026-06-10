@@ -50,6 +50,11 @@ def index():
     return FileResponse(WEB_DIR / "index.html")
 
 
+@app.get("/login")
+def login_page():
+    return FileResponse(WEB_DIR / "login.html")
+
+
 @app.get("/admin")
 def admin_index():
     return FileResponse(WEB_DIR / "admin.html")

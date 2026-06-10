@@ -799,3 +799,128 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== 登录页 ===== */
+.login-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.login-card h1 {
+  margin-bottom: 24px;
+  font-size: 1.45rem;
+}
+
+.login-card form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-card input[type="text"],
+.login-card input[type="password"] {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font: inherit;
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.login-card input[type="text"]::placeholder,
+.login-card input[type="password"]::placeholder {
+  color: #596675;
+}
+
+.login-card button[type="submit"] {
+  min-height: 46px;
+  border-radius: 8px;
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-weight: 700;
+  font: inherit;
+  border: 0;
+  cursor: pointer;
+}
+
+.login-card .error-text {
+  padding: 0;
+  background: transparent;
+  min-height: 20px;
+}
+
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.login-remember input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.login-hint {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* ===== Toast 通知 ===== */
+.sf-toast {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9999;
+  max-width: 380px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.sf-toast-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sf-toast-info {
+  background: var(--info);
+  color: #ffffff;
+}
+
+.sf-toast-success {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.sf-toast-error {
+  background: var(--danger);
+  color: #ffffff;
+}
