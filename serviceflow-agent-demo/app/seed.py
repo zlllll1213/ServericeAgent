@@ -87,8 +87,9 @@ def seed_database(reset: bool = False) -> None:
 
 def seed_admin_users(db) -> None:
     now = datetime.now()
-    admin_hash = settings.admin_password_hash or (DEMO_ADMIN_PASSWORD_HASH if settings.demo_auth_enabled else None)
-    agent_hash = settings.agent_password_hash or (DEMO_AGENT_PASSWORD_HASH if settings.demo_auth_enabled else None)
+    # seed 脚本只服务本地演示数据；默认写入 demo hash，保证登录页提示的 admin/admin 可直接使用。
+    admin_hash = settings.admin_password_hash or DEMO_ADMIN_PASSWORD_HASH
+    agent_hash = settings.agent_password_hash or DEMO_AGENT_PASSWORD_HASH
     existing = {user.user_id: user for user in db.query(AdminUser).all()}
     users = []
     if "A1001" not in existing:

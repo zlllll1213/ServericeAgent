@@ -55,6 +55,11 @@ def admin_index():
     return FileResponse(WEB_DIR / "admin.html")
 
 
+@app.get("/login")
+def login_page():
+    return FileResponse(WEB_DIR / "login.html")
+
+
 @app.get("/api/health")
 def health():
     with SessionLocal() as db:

@@ -14,6 +14,16 @@ def test_correct_account_can_login_and_token_reads_me(client):
     assert me.json()["role"] == "admin"
 
 
+def test_seeded_demo_accounts_can_login(client):
+    admin = client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+    agent = client.post("/api/auth/login", json={"username": "service_agent", "password": "agent"})
+
+    assert admin.status_code == 200
+    assert admin.json()["role"] == "admin"
+    assert agent.status_code == 200
+    assert agent.json()["role"] == "agent"
+
+
 def test_admin_user_password_hash_is_seeded(client):
     with SessionLocal() as db:
         admin = db.query(AdminUser).filter(AdminUser.username == "admin").first()
@@ -37,6 +47,13 @@ def test_admin_api_requires_token_by_default(client):
     assert response.status_code == 401
     assert response.json()["error_code"] == "AUTH_FAILED"
     assert forged.status_code == 401
+
+
+def test_admin_api_accepts_bearer_token(client):
+    login = client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+    response = client.get("/api/admin/conversations", headers={"Authorization": f"Bearer {login.json()['access_token']}"})
+
+    assert response.status_code == 200
 
 
 def test_demo_role_header_only_works_when_explicitly_enabled(client, monkeypatch):

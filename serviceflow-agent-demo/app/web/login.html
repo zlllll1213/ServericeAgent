@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ServiceFlow Login</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="login-panel" aria-label="ServiceFlow 后台登录">
+        <div>
+          <p class="product-mark">ServiceFlow Admin</p>
+          <h1>登录客服后台</h1>
+          <p class="login-copy">使用演示账号进入 Evidence Console，查看会话、工单、知识库和 Agent 证据链。</p>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <label for="login-username">账号</label>
+          <input id="login-username" name="username" autocomplete="username" value="admin" required />
+
+          <label for="login-password">密码</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" value="admin" required />
+
+          <label class="remember-row">
+            <input id="remember-me" name="remember" type="checkbox" />
+            <span>记住我</span>
+          </label>
+
+          <button type="submit" id="login-submit">登录后台</button>
+          <p id="login-error" class="error-text" role="status"></p>
+        </form>
+
+        <div class="demo-hints" aria-label="演示账号">
+          <span>admin / admin</span>
+          <span>service_agent / agent</span>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/static/login.js"></script>
+  </body>
+</html>

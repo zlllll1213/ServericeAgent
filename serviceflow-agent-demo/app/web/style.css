@@ -34,6 +34,8 @@ body {
 }
 
 button,
+input,
+select,
 textarea {
   font: inherit;
 }
@@ -49,6 +51,8 @@ button:disabled {
 }
 
 button:focus-visible,
+input:focus-visible,
+select:focus-visible,
 textarea:focus-visible {
   outline: 3px solid rgba(31, 111, 91, 0.35);
   outline-offset: 3px;
@@ -299,6 +303,11 @@ p {
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.feedback-area .feedback-status {
+  flex: 1 1 170px;
+  font-weight: 700;
 }
 
 .feedback-area button,
@@ -624,6 +633,7 @@ pre {
 
 .admin-nav button,
 #admin-refresh,
+#admin-logout,
 .admin-actions button,
 .admin-form button,
 .link-button {
@@ -652,6 +662,26 @@ pre {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-user {
+  min-height: 34px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .admin-view {
@@ -683,6 +713,7 @@ pre {
   text-align: left;
   vertical-align: top;
   font-size: 0.86rem;
+  overflow-wrap: anywhere;
 }
 
 .admin-table th {
@@ -727,8 +758,14 @@ pre {
 
 .admin-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px auto auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+}
+
+.admin-form label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .admin-form input,
@@ -744,6 +781,20 @@ pre {
 .admin-form textarea {
   grid-column: 1 / -1;
   min-height: 120px;
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.admin-message-line {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 10px;
+  line-height: 1.5;
 }
 
 .metrics-grid {
@@ -783,6 +834,229 @@ pre {
   font-weight: 800;
 }
 
+.login-shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: var(--bg);
+}
+
+.login-panel {
+  width: min(100%, 460px);
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.login-panel h1 {
+  font-size: 2rem;
+}
+
+.login-copy {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.login-form {
+  display: grid;
+  gap: 10px;
+}
+
+.login-form label {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.login-form button {
+  min-height: 44px;
+  border-radius: 8px;
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remember-row input {
+  width: 16px;
+  min-height: 16px;
+  accent-color: var(--accent);
+}
+
+.demo-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.demo-hints span {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.toast-region {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 36px));
+}
+
+.toast {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.toast-success {
+  border-color: #b8d4c5;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.toast-error {
+  border-color: #e2b8b0;
+  color: var(--danger);
+  background: #fff7f5;
+}
+
+.sf-dialog {
+  width: min(460px, calc(100vw - 32px));
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.sf-dialog::backdrop {
+  background: rgba(16, 19, 22, 0.42);
+}
+
+.dialog-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.dialog-card h2 {
+  font-size: 1.05rem;
+}
+
+.dialog-card p,
+.dialog-card label {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.dialog-card input,
+.dialog-card textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.dialog-error {
+  min-height: 20px;
+  color: var(--danger) !important;
+  font-weight: 700;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialog-actions button,
+.empty-state button,
+.empty-action {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.primary-action {
+  background: var(--accent-strong) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-strong) !important;
+}
+
+.danger-action {
+  background: var(--danger) !important;
+  color: #ffffff !important;
+  border-color: var(--danger) !important;
+}
+
+.loading-state,
+.empty-state {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.empty-state {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     grid-template-columns: 1fr;
@@ -797,5 +1071,10 @@ pre {
   .admin-form,
   .metrics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

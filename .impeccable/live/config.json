@@ -1,0 +1,6 @@
+{
+  "files": ["serviceflow-agent-demo/app/web/**/*.html"],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

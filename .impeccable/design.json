@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-09T15:57:42Z",
+  "title": "Design System: ServiceFlow Agent Demo",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Console Background",
+        "canonical": "#eef2ef",
+        "tonalRamp": ["#101316", "#26313c", "#4e5d68", "#b9c6be", "#d4ddd5", "#eef2ef", "#f6f8f6", "#ffffff"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Panel White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#101316", "#26313c", "#4e5d68", "#b9c6be", "#d4ddd5", "#eef2ef", "#f6f8f6", "#ffffff"]
+      },
+      "surface-strong": {
+        "role": "neutral",
+        "displayName": "Strong Ink Surface",
+        "canonical": "#101316",
+        "tonalRamp": ["#101316", "#26313c", "#4e5d68", "#b9c6be", "#d4ddd5", "#eef2ef", "#f6f8f6", "#ffffff"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111827",
+        "tonalRamp": ["#101316", "#111827", "#26313c", "#4e5d68", "#b9c6be", "#d4ddd5", "#f6f8f6", "#ffffff"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Operational Muted Text",
+        "canonical": "#4e5d68",
+        "tonalRamp": ["#101316", "#26313c", "#4e5d68", "#7a8991", "#b9c6be", "#d4ddd5", "#eef2ef", "#ffffff"]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Service Green",
+        "canonical": "#1f6f5b",
+        "tonalRamp": ["#06241d", "#0d362c", "#134e40", "#1f6f5b", "#4c907e", "#8fbcad", "#c9dbd1", "#e5f0eb"]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Deep Service Green",
+        "canonical": "#134e40",
+        "tonalRamp": ["#06241d", "#0d362c", "#134e40", "#1f6f5b", "#4c907e", "#8fbcad", "#c9dbd1", "#e5f0eb"]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Evidence Mint",
+        "canonical": "#e5f0eb",
+        "tonalRamp": ["#06241d", "#0d362c", "#134e40", "#1f6f5b", "#4c907e", "#8fbcad", "#c9dbd1", "#e5f0eb"]
+      },
+      "info": {
+        "role": "secondary",
+        "displayName": "Trace Blue",
+        "canonical": "#244f79",
+        "tonalRamp": ["#0d2033", "#173653", "#244f79", "#4d7197", "#7f9ab5", "#b5c8db", "#d5e0ec", "#e7eef5"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger Red",
+        "canonical": "#a33a2b",
+        "tonalRamp": ["#35110c", "#5a1d14", "#7d2b20", "#a33a2b", "#c46657", "#dc9a8f", "#efcbc5", "#fff1ef"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Product title and main workspace headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Admin sidebar title and major shell labels."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel headings, admin page titles, and compact view headers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Chat explanations, panel prose, form copy, and readable Chinese interface text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Kickers, chips, nav items, table headers, message labels, and compact controls."
+      }
+    },
+    "shadows": [
+      {
+        "name": "console-panel-shadow",
+        "value": "0 18px 42px rgba(17, 24, 39, 0.10)",
+        "purpose": "Main chat and debug panels."
+      },
+      {
+        "name": "micro-surface-shadow",
+        "value": "0 1px 2px rgba(17, 24, 39, 0.06)",
+        "purpose": "Status chips and compact controls."
+      },
+      {
+        "name": "message-shadow",
+        "value": "0 1px 2px rgba(17, 24, 39, 0.05)",
+        "purpose": "Message bubbles inside the chat stream."
+      }
+    ],
+    "motion": [
+      {
+        "name": "interaction-feedback",
+        "value": "160ms ease-out",
+        "purpose": "Hover border shifts and small translate feedback on utility buttons."
+      },
+      {
+        "name": "gsap-default",
+        "value": "180ms power2.out",
+        "purpose": "Optional GSAP state updates when the local vendor runtime is available."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition-duration: 1ms",
+        "purpose": "Reduced-motion fallback for users who prefer less motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "workspace-stack",
+        "value": "980px",
+        "purpose": "Chat and debug panels collapse to one column."
+      },
+      {
+        "name": "admin-stack",
+        "value": "900px",
+        "purpose": "Admin sidebar becomes static and grids collapse."
+      },
+      {
+        "name": "compact-mobile",
+        "value": "620px",
+        "purpose": "Shell padding tightens, h1 reduces, messages become full width, and metrics stack."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Composer Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Tall primary chat action used where a user commits a message.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">发送问题</button>",
+      "css": ".ds-btn-primary { min-height: 58px; min-width: 112px; border: 0; border-radius: 8px; background: #134e40; color: #ffffff; padding: 8px 14px; font: inherit; font-weight: 700; cursor: pointer; transition: transform 160ms ease-out, background-color 160ms ease-out; } .ds-btn-primary:hover { transform: translateY(-1px); background: #1f6f5b; } .ds-btn-primary:focus-visible { outline: 3px solid rgba(31, 111, 91, 0.35); outline-offset: 3px; } .ds-btn-primary:disabled { cursor: not-allowed; opacity: 0.72; }"
+    },
+    {
+      "name": "Utility Button",
+      "kind": "button",
+      "refersTo": "button-utility",
+      "description": "Secondary action used for prompts, refresh, clear, and table operations.",
+      "html": "<button class=\"ds-btn-utility\" type=\"button\">刷新</button>",
+      "css": ".ds-btn-utility { min-height: 36px; border: 1px solid #d4ddd5; border-radius: 8px; background: #ffffff; color: #111827; padding: 8px 11px; font: inherit; font-weight: 700; cursor: pointer; transition: transform 160ms ease-out, border-color 160ms ease-out; } .ds-btn-utility:hover { transform: translateY(-1px); border-color: #1f6f5b; } .ds-btn-utility:focus-visible { outline: 3px solid rgba(31, 111, 91, 0.35); outline-offset: 3px; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Pill used for environment, retriever, and session status.",
+      "html": "<span class=\"ds-chip\"><span class=\"ds-chip-dot\"></span>本地演示环境</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 13px; border: 1px solid #d4ddd5; border-radius: 999px; background: #ffffff; color: #111827; font: 700 0.9rem/1.2 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06); } .ds-chip-dot { width: 9px; height: 9px; border-radius: 50%; background: #1f6f5b; }"
+    },
+    {
+      "name": "Evidence Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Main white work surface used for chat and debug panels.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-panel-head\"><p>Agent Evidence</p><h2>路由与工具调用</h2></header><p class=\"ds-panel-body\">发送一个问题后，这里会显示意图识别原因和下一步动作。</p></section>",
+      "css": ".ds-panel { border: 1px solid #d4ddd5; border-radius: 8px; background: #ffffff; color: #111827; box-shadow: 0 18px 42px rgba(17, 24, 39, 0.10); overflow: hidden; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-panel-head { padding: 18px 20px; border-bottom: 1px solid #d4ddd5; background: #f6f8f6; } .ds-panel-head p { margin: 0 0 6px; color: #134e40; font-size: 0.85rem; font-weight: 700; } .ds-panel-head h2 { margin: 0; font-size: 1.1rem; line-height: 1.25; text-wrap: balance; } .ds-panel-body { margin: 0; padding: 14px; color: #244f79; background: #e7eef5; line-height: 1.55; text-wrap: pretty; }"
+    },
+    {
+      "name": "Textarea Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Chat composer and admin text area field.",
+      "html": "<textarea class=\"ds-textarea\" rows=\"2\" placeholder=\"输入问题，例如：我要退货，订单号 10001\"></textarea>",
+      "css": ".ds-textarea { width: 100%; min-height: 58px; max-height: 142px; resize: vertical; border: 1px solid #d4ddd5; border-radius: 8px; padding: 12px 14px; background: #f6f8f6; color: #111827; font: 400 1rem/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-textarea::placeholder { color: #596675; } .ds-textarea:focus-visible { outline: 3px solid rgba(31, 111, 91, 0.35); outline-offset: 3px; }"
+    },
+    {
+      "name": "Message Bubble",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Assistant message bubble with evidence mint background.",
+      "html": "<article class=\"ds-message\"><span class=\"ds-message-label\">Agent</span><p>我可以查询订单、申请退货、回答技术和售后政策问题。</p></article>",
+      "css": ".ds-message { max-width: min(74ch, 86%); padding: 12px 14px 14px; border-radius: 8px; border: 1px solid #c9dbd1; background: #e5f0eb; color: #111827; box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-message-label { display: block; margin-bottom: 6px; color: #4e5d68; font-size: 0.75rem; font-weight: 800; font-variant-numeric: tabular-nums; } .ds-message p { margin: 0; line-height: 1.65; text-wrap: pretty; }"
+    },
+    {
+      "name": "Admin Table",
+      "kind": "custom",
+      "refersTo": "table-cell",
+      "description": "Dense admin data table with scroll wrapper and muted headers.",
+      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>Conversation</th><th>Intent</th><th>Status</th></tr></thead><tbody><tr><td>C1001</td><td>ORDER_QUERY</td><td>WAITING_HUMAN</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap { overflow: auto; border: 1px solid #d4ddd5; border-radius: 8px; background: #ffffff; } .ds-table { width: 100%; min-width: 520px; border-collapse: collapse; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-table th, .ds-table td { padding: 11px 12px; border-bottom: 1px solid #d4ddd5; text-align: left; vertical-align: top; font-size: 0.86rem; } .ds-table th { color: #4e5d68; background: #f6f8f6; font-weight: 800; } .ds-table td { color: #111827; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Sidebar Navigation Item",
+      "kind": "nav",
+      "refersTo": "button-primary",
+      "description": "Admin rail navigation with active green state.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav-item ds-nav-item-active\" type=\"button\">会话列表</button><button class=\"ds-nav-item\" type=\"button\">工单管理</button></nav>",
+      "css": ".ds-nav { display: grid; gap: 8px; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-nav-item { min-height: 36px; border: 1px solid #d4ddd5; border-radius: 8px; background: #ffffff; color: #111827; padding: 8px 10px; font: inherit; font-weight: 700; text-align: left; cursor: pointer; } .ds-nav-item:hover { border-color: #1f6f5b; } .ds-nav-item:focus-visible { outline: 3px solid rgba(31, 111, 91, 0.35); outline-offset: 3px; } .ds-nav-item-active { background: #134e40; color: #ffffff; border-color: #134e40; }"
+    },
+    {
+      "name": "Knowledge Hit",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Compact evidence list item for retrieved knowledge results.",
+      "html": "<li class=\"ds-hit\"><strong>tech</strong><span>knowledge_base/tech/smart_router_wifi.md</span><small>score 0.923 · qdrant</small></li>",
+      "css": ".ds-hit { display: grid; gap: 4px; padding: 10px; border: 1px solid #d4ddd5; border-radius: 8px; background: #ffffff; color: #111827; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .ds-hit strong, .ds-hit small { font-variant-numeric: tabular-nums; } .ds-hit span { color: #4e5d68; font-size: 0.84rem; overflow-wrap: anywhere; } .ds-hit small { color: #134e40; font-weight: 700; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Evidence Console",
+    "overview": "ServiceFlow uses a restrained product UI built for inspecting an agent, not selling one. The screen should feel like a working service console: calm, precise, and dense enough to explain decisions while leaving the answer, route, tools, retrieval hits, and handoff state visible at the same time.\n\nThe visual system is intentionally familiar. It uses a cool gray-green background, white operational panels, a deep service green accent, 8px controls, and a single system sans stack. The interface rejects generic chatbot marketing, opaque AI magic, decorative SaaS metrics, and fake glassmorphism. Evidence is the design material.",
+    "keyCharacteristics": [
+      "Evidence-first composition with chat and debug surfaces visible together.",
+      "Restrained green accent used for primary actions, active navigation, and service status.",
+      "White panels, thin borders, and soft elevation for long-running demo comfort.",
+      "Fixed product typography with readable Chinese copy and tabular numerals for IDs, traces, metrics, and scores.",
+      "Reduced-motion-safe interaction feedback that supports state changes instead of staging a show."
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Service Green is the only brand accent on a screen. Do not add decorative accent colors beyond semantic states.",
+        "section": "colors"
+      },
+      {
+        "name": "The Evidence Color Rule",
+        "body": "Blue explains, green acts, red warns. If a color does not communicate state or action, remove it.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Display Labels Rule",
+        "body": "Buttons, table headers, form labels, and evidence labels use the same product sans scale. Do not introduce display fonts or oversized type into dense UI.",
+        "section": "typography"
+      },
+      {
+        "name": "The Data Alignment Rule",
+        "body": "Any value that can change length or format uses tabular numerals and wrapping guards so the evidence panel never breaks layout.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Lift Rule",
+        "body": "Shadows explain hierarchy, never mood. If a surface already has a border and tonal contrast, do not add another shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Glass Rule",
+        "body": "Do not use blur, frosted panels, or decorative transparency. ServiceFlow is an evidence console, not a glass marketing surface.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep chat, route trace, tool calls, retrieval hits, citations, and evaluation visible as first-class evidence.",
+      "Do use Deep Service Green for primary actions and active navigation only.",
+      "Do keep panels at 8px radius, thin borders, and restrained elevation.",
+      "Do use min-height: 100dvh, safe-area padding, and responsive one-column fallbacks for narrow screens.",
+      "Do keep motion tied to state: entry hints, hover feedback, and changed evidence updates only.",
+      "Do use text-wrap: balance for headings, text-wrap: pretty for prose, and tabular numerals for IDs, scores, metrics, and traces.",
+      "Do show errors next to the chat or admin action that failed."
+    ],
+    "donts": [
+      "Don't create a generic chatbot landing page. This is a working evidence console, not a marketing hero.",
+      "Don't use decorative SaaS hero metrics, big-number stat blocks, or conversion-page sections inside the product UI.",
+      "Don't imply opaque AI magic. The route, tools, retrieval, and handoff status must remain inspectable.",
+      "Don't use fake glassmorphism, frosted cards, glow-heavy affordances, or blur as surface decoration.",
+      "Don't overbuild admin chrome. Keep admin navigation familiar, dense, and stable.",
+      "Don't bury routing evidence behind tabs when the page has room to show it.",
+      "Don't introduce React, Tailwind, framework-only primitives, or build tooling into this visual system documentation.",
+      "Don't animate layout properties such as width, height, top, left, margin, or padding.",
+      "Don't add a second accent palette or purple/multicolor gradients."
+    ]
+  }
+}

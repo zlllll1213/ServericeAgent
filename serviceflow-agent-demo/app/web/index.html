@@ -42,7 +42,7 @@
 
           <div class="prompt-area">
             <p>试运行场景</p>
-            <div class="prompt-row" aria-label="测试问题">
+            <div id="prompt-row" class="prompt-row" aria-label="测试问题">
               <button type="button" data-prompt="帮我查一下订单 10001 到哪里了">查订单 10001</button>
               <button type="button" data-prompt="我要退货">我要退货</button>
               <button type="button" data-prompt="10001">10001</button>
@@ -57,16 +57,17 @@
             </div>
           </div>
 
-          <div class="feedback-area" aria-label="回答反馈">
+          <div id="feedback-area" class="feedback-area" aria-label="回答反馈">
             <span>回答反馈</span>
-            <button type="button" data-feedback="GOOD">👍 有帮助</button>
-            <button type="button" data-feedback="BAD_ANSWER">👎 没帮助</button>
+            <button type="button" data-feedback="GOOD">有帮助</button>
+            <button type="button" data-feedback="BAD_ANSWER">没帮助</button>
             <select id="feedback-type" aria-label="没帮助原因">
               <option value="BAD_ANSWER">答非所问</option>
               <option value="WRONG_TOOL">工具调用错误</option>
               <option value="MISSING_CITATION">没有引用来源</option>
               <option value="NEED_HUMAN">我想找人工客服</option>
             </select>
+            <span id="feedback-status" class="feedback-status" role="status">等待可反馈回答</span>
           </div>
 
           <form id="chat-form" class="composer">
@@ -160,8 +161,6 @@
         </aside>
       </section>
     </main>
-    <script src="/static/vendor/gsap.min.js"></script>
-    <script src="/static/vendor/ScrollTrigger.min.js"></script>
-    <script src="/static/app.js"></script>
+    <script type="module" src="/static/chat/index.js"></script>
   </body>
 </html>
