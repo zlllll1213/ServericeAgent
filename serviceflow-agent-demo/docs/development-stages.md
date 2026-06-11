@@ -1,6 +1,6 @@
 # 开发阶段记录
 
-## 第一阶段：ServiceFlow Agent Demo
+## 第一阶段：ServiceFlow Agent Console
 
 - 搭建 FastAPI 后端服务。
 - 实现 `GET /` 聊天页面入口。
@@ -458,7 +458,7 @@
 - 新增 RBAC Demo 契约测试 `test_rbac.py`。
 - 新增 tenant filter 契约测试 `test_tenant_isolation.py`。
 - 新增 Redis/限流健康契约测试 `test_rate_limit.py`。
-- 对当前 SQLite 单体 Demo 尚未接入的完整多租户、完整 RBAC、Redis 限流测试保留 skip 标注。
+- 对当前 SQLite 单体控制台 尚未接入的完整多租户、完整 RBAC、Redis 限流测试保留 skip 标注。
 - 新增 `evals/datasets/intent_eval.jsonl`，包含 40 条意图评测样本。
 - 新增 `evals/datasets/rag_eval.jsonl`，包含 30 条 RAG 评测样本。
 - 新增 `evals/datasets/tool_eval.jsonl`，包含 20 条工具评测样本。

@@ -1,51 +1,42 @@
-# ServiceFlow Agent Demo
+# ServiceFlow Agent Console
 
-ServiceFlow Agent Demo 是一个本地可运行的企业级知识库智能客服 Agent。它面向电商和数码产品售后场景，支持订单查询、退货申请、技术咨询、售后政策问答、产品咨询和投诉转人工。
+ServiceFlow Agent Console 是一个本地可运行的企业级客服 Agent 控制台。它面向电商和数码产品售后场景，把意图识别、工作流路由、业务工具、知识库检索、人工接管和质检证据放在同一套可审阅界面里。
 
-项目代码位于 [`serviceflow-agent-demo`](./serviceflow-agent-demo) 目录。把 README 放在仓库根目录后，GitHub 打开仓库首页即可直接预览完整说明。
+项目代码位于 [`serviceflow-agent-demo`](./serviceflow-agent-demo) 目录。目录名仍保留历史命名，产品展示名统一为 **ServiceFlow Agent Console**。
 
-## 为什么这不是普通 RAG
+## 产品定位
 
-普通 RAG 通常把用户问题直接送去知识库检索，再生成回答。这个 Demo 会先识别意图，再通过 LangGraph 路由到不同流程：有些问题查 SQLite 订单库，有些调用模拟 ERP 工具，有些检索指定知识库，有些直接创建人工客服工单。每次响应都会返回 `route_trace`、`tool_calls`、`retrieved_docs` 和 `ticket_id`，方便演示 Agent 的决策过程。
+普通 RAG 通常把用户问题直接送去知识库检索，再生成回答。ServiceFlow 会先识别意图，再通过 LangGraph 路由到不同流程：有些问题查 SQLite 订单库，有些调用模拟 ERP 工具，有些检索指定知识库，有些创建人工客服工单。每次响应都会返回 `route_trace`、`tool_calls`、`retrieved_docs`、`citations`、`evaluation_result` 和 `ticket_id`，方便审阅 Agent 的决策过程。
 
-## V0.3 更新内容
+## 核心能力
 
-- OpenAI-compatible LLM 配置：`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`。
-- 混合意图路由：规则路由 + LLM 路由 + 置信度融合，并返回 `route_debug`。
-- 多轮会话状态：新增 `conversation_id`、`slots`、`missing_slots`、`pending_action` 和会话日志。
-- 工具调用前确认：`create_return_request`、`create_ticket` 等状态变更工具必须经过确认或高风险升级分支。
-- RAG 回答增强：基于检索文档生成回答，并返回 `citations`。
-- 回答质量评估：每轮回复写入 `evaluation_result`，并落库到 `chat_logs`。
-- 前端调试面板增强：展示 slots、route_debug、citations、evaluation_result 和多轮测试按钮。
+- 混合意图路由：规则路由 + OpenAI-compatible LLM 路由 + 置信度融合。
+- LangGraph 工作流：订单、退货、退款、技术支持、政策问答、产品咨询、投诉和人工接管分支。
+- 工具调用确认：退货申请、工单创建等状态变更需要用户确认或进入高风险分支。
+- 检索增强回答：优先使用 Qdrant，失败时自动回退到本地 Markdown 检索。
+- 可审阅证据：展示 slots、route trace、tool calls、retrieved docs、citations、evaluation 和 ticket。
+- 人工接管闭环：后台可认领会话、人工回复、处理工单并关闭会话。
 
-## V0.4 更新内容
+## 控制台界面
 
-- 新增客服后台页面：访问 `/admin?role=agent` 或 `/admin?role=admin`。
-- 新增简单角色：`customer`、`agent`、`admin`，第一版通过 URL 参数或请求头模拟。
-- 新增会话管理：后台可查看会话列表、详情、认领、人工回复和关闭会话。
-- 新增工单管理：后台可查看工单、认领、处理、关闭。
-- 新增知识库管理：后台可新建、发布、归档文档，并触发重建索引。
-- 新增 Agent 日志可视化：后台展示最近 `chat_logs`。
-- 新增质量反馈：用户可对回答点赞或差评，后台可查看反馈和质量统计。
-- 新增人工接管逻辑：会话进入 `HUMAN_HANDLING` 后，普通聊天不再触发 Agent 自动回复。
+- `/`：客服对话工作区，左侧对话，右侧保持路由、工具、检索和质检证据可见。
+- `/login`：后台登录页，支持 `admin / admin` 和 `service_agent / agent` 两组本地账号。
+- `/admin`：后台控制台，包含会话、工单、知识库、日志、Trace、Metrics、Evaluation 和反馈视图。
+- 前端使用原生 HTML/CSS/ES Modules，无 React、Tailwind、Vite 或额外构建步骤。
 
-## V0.6 更新内容
+## 工程与质量保障
 
-- 新增 Agent Trace：每次 `/api/chat` 生成 `trace_id`，LangGraph 节点输入、输出、耗时和错误写入 `agent_traces`。
-- 新增 Metrics API：统计今日对话数、平均响应时间、P95、意图分布、工具成功率、人工转接率、差评率和错误率。
-- 新增自动化测试目录：覆盖认证、健康检查、订单查询、多轮退货、RAG、人工接管、工具函数、Retriever、Trace 等核心路径。
-- 新增 Agent 评测集：`intent`、`rag`、`tool`、`e2e` 四类 JSONL 数据集。
-- 新增评测脚本：`python evals/run_eval.py --all` 会生成 `reports/eval_report_日期.md`。
-- 新增压测脚本：`python scripts/load_test.py --users 20 --requests 200` 会生成压测报告。
-- 新增 GitHub Actions CI：执行 lint、pytest 和轻量评测。
-- 新增后台页面菜单：Agent Trace、Metrics 看板、Evaluation 报告。
-- 新增工程文档：`docs/api.md`、`docs/architecture.md`、`docs/evaluation.md`、`docs/deployment.md`、`docs/testing.md`。
+- 自动化测试覆盖认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和前端静态契约。
+- 评测集覆盖 `intent`、`rag`、`tool`、`e2e` 四类样本，报告写入 `reports/eval_report_日期.md`。
+- 压测脚本 `python scripts/load_test.py --users 20 --requests 200` 会生成压测报告。
+- GitHub Actions 执行 lint、pytest 和轻量评测。
+- 工程文档位于 `serviceflow-agent-demo/docs/`。
 
 ## 角色说明
 
 - `customer`：普通用户，可以使用 `/` 发起聊天、转人工、提交回答反馈。
-- `agent`：人工客服，可以通过 `/admin?role=agent` 查看并认领会话、回复用户、处理工单。
-- `admin`：管理员，可以通过 `/admin?role=admin` 管理知识库、查看日志和质检统计。
+- `agent`：人工客服，登录 `/login` 后可在 `/admin` 查看并认领会话、回复用户、处理工单。
+- `admin`：管理员，登录 `/login` 后可在 `/admin` 管理知识库、查看日志、Trace、Metrics 和质检统计。
 
 ## 系统架构图
 
@@ -103,6 +94,7 @@ flowchart TD
 - 状态变更确认：退货单只会在用户回复“确认”后创建，取消不会写入退货记录。
 - 审计日志：`chat_logs` 记录每轮 route_trace、tool_calls、retrieved_docs、citations 和 evaluation_result。
 - Web Chat 页面：左侧对话，右侧展示 Agent 调试证据。
+- Admin Console：通过登录页进入，使用 Bearer token 访问后台 API，支持 hash 路由切换管理视图。
 
 ## 技术栈
 
@@ -114,7 +106,7 @@ flowchart TD
 - SQLAlchemy
 - Qdrant
 - Uvicorn
-- 原生 HTML / CSS / JavaScript
+- 原生 HTML / CSS / ES Modules
 
 ## 常用命令
 
@@ -129,7 +121,7 @@ make docker-up
 make docker-down
 ```
 
-## 启动方式（无 Qdrant 兜底模式）
+## 快速启动（无需 Qdrant）
 
 ```bash
 cd serviceflow-agent-demo
@@ -144,18 +136,22 @@ uvicorn main:app --reload
 
 ```text
 http://127.0.0.1:8000
+http://127.0.0.1:8000/login
+http://127.0.0.1:8000/admin
 ```
 
-这个模式不要求 Qdrant 已启动。后端会优先尝试 Qdrant，如果连接失败，会自动使用 `SimpleRetriever`，方便快速演示。
-
-后台访问：
+本地后台账号：
 
 ```text
-http://127.0.0.1:8000/admin?role=admin
-http://127.0.0.1:8000/admin?role=agent
+admin / admin
+service_agent / agent
 ```
 
-后台 API 默认使用 Bearer token。`X-User-Role` 只在显式设置 `DEMO_AUTH_ENABLED=true` 的本地演示模式下生效，不应作为生产认证方式。
+这个模式不要求 Qdrant 已启动。后端会优先尝试 Qdrant，如果连接失败，会自动使用 `SimpleRetriever`，方便快速启动和离线验证。
+
+后台 API 默认使用 Bearer token。登录页会调用 `POST /api/auth/login` 并保存会话 token；`X-User-Role` 只在显式设置 `DEMO_AUTH_ENABLED=true` 的本地演示模式下生效，不应作为生产认证方式。
+
+命令行登录示例：
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/auth/login \
@@ -163,7 +159,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login \
   -d '{"username":"admin","password":"admin"}'
 ```
 
-## Qdrant Docker Compose 启动方式
+## Qdrant 启动方式
 
 启动 Qdrant：
 
@@ -187,7 +183,7 @@ pip install -r requirements.txt
 python -m app.rag.index_qdrant
 ```
 
-启动 Demo：
+启动控制台：
 
 ```bash
 python app/seed.py
@@ -339,7 +335,7 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 
 重置当前会话状态，清空 slots、history 和 pending_action。
 
-### V0.4 后台 API
+### 后台管理 API
 
 - `GET /api/admin/conversations`
 - `GET /api/admin/conversations/{conversation_id}`
@@ -362,7 +358,7 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 - `GET /api/admin/evaluation-summary`
 - `GET /api/admin/chat-logs`
 
-### V0.6 Trace / Metrics / Evaluation API
+### Trace / Metrics / Evaluation API
 
 - `GET /api/admin/traces`
 - `GET /api/admin/traces/{trace_id}`
@@ -372,7 +368,7 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 - `GET /api/admin/evaluation-reports/latest`
 - `GET /api/admin/evaluation-reports/{filename}/download`
 
-## V0.6 自动化测试
+## 自动化测试
 
 ```bash
 cd serviceflow-agent-demo
@@ -380,7 +376,7 @@ make test
 make coverage
 ```
 
-测试目录按能力拆分：认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和 tenant 契约。当前仓库仍是 SQLite 单体 Demo，完整 PostgreSQL/Redis/MinIO/多租户强隔离测试在本阶段以契约或 skip 标注保留入口。
+测试目录按能力拆分：认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和 tenant 契约。当前仓库仍是 SQLite 单体控制台，完整 PostgreSQL/Redis/MinIO/多租户强隔离测试在本阶段以契约或 skip 标注保留入口。
 
 ## Agent 评测集
 
@@ -397,7 +393,7 @@ python evals/run_eval.py --dataset e2e
 
 ## Trace 与 Metrics
 
-每次聊天响应都会返回 `trace_id`。后台 `/admin?role=admin` 的 Agent Trace 页面可以查看完整节点链路；Metrics 看板展示今日对话数、响应时间、意图分布、工具成功率、人工转接率和错误率。
+每次聊天响应都会返回 `trace_id`。登录 `/admin` 后，Agent Trace 页面可以查看完整节点链路；Metrics 看板展示今日对话数、响应时间、意图分布、工具成功率、人工转接率和错误率。
 
 ## 压测
 
@@ -410,7 +406,7 @@ python scripts/load_test.py --users 10 --requests 100
 
 脚本会输出成功率、平均响应时间、P95、QPS，并生成 `reports/load_test_report_日期.md`。
 
-## V0.4 测试流程
+## 后台验收流程
 
 ### 测试一：人工转接
 
@@ -467,4 +463,4 @@ curl http://127.0.0.1:8000/api/returns
 - 接入真实 ERP，把工具函数从 SQLite 模拟替换成真实 API。
 - 接入客服后台，处理工单分配、状态流转和 SLA。
 - 加入人工审核，允许客服确认退货或投诉处理结果。
-- V0.4 规划：接入真实客服权限、人工审核队列、Agent 指标看板、跨渠道会话合并、embedding 服务配置化和更严格的 LLM Judge 评测集。
+- 强化权限模型、人工审核队列、跨渠道会话合并、embedding 服务配置化和更严格的 LLM Judge 评测集。

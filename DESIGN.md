@@ -1,6 +1,6 @@
 ---
-name: ServiceFlow Agent Demo
-description: Evidence-first customer service agent console for workflow, retrieval, and handoff demos
+name: ServiceFlow Agent Console
+description: Evidence-first customer service agent console for workflow, retrieval, and handoff review
 colors:
   background: "#eef2ef"
   surface: "#ffffff"
@@ -98,7 +98,7 @@ components:
     typography: "{typography.body}"
 ---
 
-# Design System: ServiceFlow Agent Demo
+# Design System: ServiceFlow Agent Console
 
 ## 1. Overview
 
@@ -111,7 +111,7 @@ The visual system is intentionally familiar. It uses a cool gray-green backgroun
 **Key Characteristics:**
 - Evidence-first composition with chat and debug surfaces visible together.
 - Restrained green accent used for primary actions, active navigation, and service status.
-- White panels, thin borders, and soft elevation for long-running demo comfort.
+- White panels, thin borders, and soft elevation for long-running console use.
 - Fixed product typography with readable Chinese copy and tabular numerals for IDs, traces, metrics, and scores.
 - Reduced-motion-safe interaction feedback that supports state changes instead of staging a show.
 

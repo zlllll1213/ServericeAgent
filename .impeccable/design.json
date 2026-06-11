@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-06-09T15:57:42Z",
-  "title": "Design System: ServiceFlow Agent Demo",
+  "title": "Design System: ServiceFlow Agent Console",
   "extensions": {
     "colorMeta": {
       "background": {
@@ -219,7 +219,7 @@
     "keyCharacteristics": [
       "Evidence-first composition with chat and debug surfaces visible together.",
       "Restrained green accent used for primary actions, active navigation, and service status.",
-      "White panels, thin borders, and soft elevation for long-running demo comfort.",
+      "White panels, thin borders, and soft elevation for long-running console use.",
       "Fixed product typography with readable Chinese copy and tabular numerals for IDs, traces, metrics, and scores.",
       "Reduced-motion-safe interaction feedback that supports state changes instead of staging a show."
     ],

@@ -5,16 +5,16 @@
 product
 
 ## Users
-Demo operators, solution engineers, product stakeholders, and service operations reviewers evaluating an enterprise customer-service agent. They use the app locally to test customer questions, inspect routing decisions, check knowledge retrieval, and understand how agent workflow, business data, tools, and human handoff fit together.
+Console operators, solution engineers, product stakeholders, and service operations reviewers evaluating an enterprise customer-service agent. They use the app locally to test customer questions, inspect routing decisions, check knowledge retrieval, and understand how agent workflow, business data, tools, and human handoff fit together.
 
 ## Product Purpose
-ServiceFlow Agent Demo shows that enterprise support automation is more than ordinary RAG. It classifies intent, routes each request through a LangGraph workflow, queries SQLite business data, calls simulated ERP-style tools, retrieves from typed knowledge bases, creates human tickets for escalation, and returns a visible decision trace for demos.
+ServiceFlow Agent Console shows that enterprise support automation is more than ordinary RAG. It classifies intent, routes each request through a LangGraph workflow, queries SQLite business data, calls simulated ERP-style tools, retrieves from typed knowledge bases, creates human tickets for escalation, and returns a visible decision trace for review and operations.
 
 ## Brand Personality
 Clear, operational, credible. The interface should feel like a working service console: direct, inspectable, calm under pressure, and built for explaining agent decisions rather than hiding them.
 
 ## Anti-references
-Avoid a generic chatbot landing page, decorative SaaS hero metrics, opaque AI magic, fake glassmorphism, overbuilt admin chrome, and designs that bury routing evidence behind tabs. Avoid framework-heavy rewrites that make the current no-build demo harder to run.
+Avoid a generic chatbot landing page, decorative SaaS hero metrics, opaque AI magic, fake glassmorphism, overbuilt admin chrome, and designs that bury routing evidence behind tabs. Avoid framework-heavy rewrites that make the current no-build console harder to run.
 
 ## Design Principles
 - Show the workflow, not just the answer.

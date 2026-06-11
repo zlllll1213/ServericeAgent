@@ -27,7 +27,7 @@ WEB_DIR = ROOT / "app" / "web"
 Base.metadata.create_all(bind=engine)
 ensure_schema_updates()
 
-app = FastAPI(title="ServiceFlow Agent Demo")
+app = FastAPI(title="ServiceFlow Agent Console")
 app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 app.include_router(admin_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")

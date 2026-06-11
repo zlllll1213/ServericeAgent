@@ -1,1 +1,1 @@
-"""ServiceFlow Agent Demo application package."""
+"""ServiceFlow Agent Console application package."""
