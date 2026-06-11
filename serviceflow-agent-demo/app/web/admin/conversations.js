@@ -2,16 +2,30 @@ import { apiClient } from "../shared/api-client.js";
 import { actionButton, escapeHtml, jsonBlock, promptAction, renderTable, toast } from "../shared/ui-kit.js";
 import { adminContext } from "./context.js";
 
+function compactValue(value, { head = 8, tail = 6 } = {}) {
+  const text = String(value || "-");
+  if (text.length <= head + tail + 3) return escapeHtml(text);
+  const label = `${text.slice(0, head)}...${text.slice(-tail)}`;
+  return `<span title="${escapeHtml(text)}">${escapeHtml(label)}</span>`;
+}
+
+function compactTimestamp(value) {
+  const text = String(value || "-");
+  // 列表视图优先扫读效率，完整时间保留在 title，详情接口仍可查看原始字段。
+  const label = text.includes("T") ? text.replace("T", " ").slice(0, 16) : text.slice(0, 16);
+  return `<span title="${escapeHtml(text)}">${escapeHtml(label || "-")}</span>`;
+}
+
 function conversationRows(items) {
   return items.map((item) => [
-    escapeHtml(item.conversation_id),
+    compactValue(item.conversation_id, { head: 9, tail: 6 }),
     escapeHtml(item.user_id),
     escapeHtml(item.current_intent || "-"),
     escapeHtml(item.status),
     escapeHtml(item.handoff_status),
     escapeHtml(item.assigned_agent_id || "-"),
     escapeHtml(item.last_message_preview || "-"),
-    escapeHtml(item.updated_at),
+    compactTimestamp(item.updated_at),
     `<div class="admin-actions">
       ${actionButton("查看", "detail", item.conversation_id)}
       ${actionButton("认领", "assign", item.conversation_id)}
@@ -91,7 +105,21 @@ export async function loadConversations(container) {
     ${renderTable(
       ["Conversation", "User", "Intent", "Status", "Handoff", "Agent", "Preview", "Updated", "操作"],
       conversationRows(data),
-      { emptyMessage: "暂无会话。", emptyAction: `<a class="empty-action" href="/">打开客服演示</a>` },
+      {
+        emptyMessage: "暂无会话。",
+        emptyAction: `<a class="empty-action" href="/">打开客服演示</a>`,
+        columnClasses: [
+          "cell-id",
+          "cell-compact",
+          "cell-compact",
+          "cell-status",
+          "cell-status",
+          "cell-compact",
+          "cell-preview",
+          "cell-date",
+          "cell-actions",
+        ],
+      },
     )}
     <section class="admin-detail" id="conversation-detail"></section>`;
 

@@ -702,24 +702,56 @@ pre {
 
 .admin-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 960px;
   border-collapse: collapse;
 }
 
 .admin-table th,
 .admin-table td {
-  padding: 11px 12px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
-  font-size: 0.86rem;
-  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .admin-table th {
   color: var(--muted);
   background: var(--surface-muted);
   font-weight: 800;
+}
+
+.admin-table .cell-id {
+  width: 136px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table .cell-compact {
+  width: 72px;
+  white-space: nowrap;
+}
+
+.admin-table .cell-status {
+  width: 76px;
+  white-space: nowrap;
+}
+
+.admin-table .cell-preview {
+  min-width: 240px;
+}
+
+.admin-table .cell-date {
+  width: 132px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table .cell-actions {
+  width: 116px;
+  white-space: nowrap;
 }
 
 .admin-actions {

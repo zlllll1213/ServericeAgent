@@ -8,12 +8,21 @@ export function jsonBlock(value) {
   return `<pre>${escapeHtml(JSON.stringify(value ?? {}, null, 2))}</pre>`;
 }
 
-export function renderTable(headers, rows, { emptyMessage = "暂无数据。", emptyAction = "", rowClass = "" } = {}) {
+export function renderTable(headers, rows, {
+  emptyMessage = "暂无数据。",
+  emptyAction = "",
+  rowClass = "",
+  columnClasses = [],
+} = {}) {
   if (!rows.length) {
     return `<section class="empty-state"><p>${escapeHtml(emptyMessage)}</p>${emptyAction}</section>`;
   }
-  const headerHtml = headers.map((item) => `<th>${escapeHtml(item)}</th>`).join("");
-  const bodyHtml = rows.map((row) => `<tr class="${escapeHtml(rowClass)}">${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("");
+  // 表格默认安全转义，列级 class 只用于控制演示中长 ID、状态、时间等字段的可读性。
+  const cellClass = (index) => columnClasses[index] ? ` class="${escapeHtml(columnClasses[index])}"` : "";
+  const headerHtml = headers.map((item, index) => `<th${cellClass(index)}>${escapeHtml(item)}</th>`).join("");
+  const bodyHtml = rows.map((row) => (
+    `<tr class="${escapeHtml(rowClass)}">${row.map((cell, index) => `<td${cellClass(index)}>${cell}</td>`).join("")}</tr>`
+  )).join("");
   return `<div class="admin-table-wrap"><table class="admin-table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div>`;
 }
 

@@ -24,7 +24,8 @@ class QdrantRestClient:
         self.url = (url or settings.qdrant_url).rstrip("/")
         self.api_key = api_key or settings.qdrant_api_key
         self.timeout = timeout if timeout is not None else settings.qdrant_timeout_seconds
-        self.client = client or httpx.Client(timeout=self.timeout)
+        # Qdrant 是本地/显式配置的内部服务，禁用环境代理可避免系统代理变量污染离线演示和测试。
+        self.client = client or httpx.Client(timeout=self.timeout, trust_env=False)
 
     def request(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
         headers = {"Content-Type": "application/json"}
