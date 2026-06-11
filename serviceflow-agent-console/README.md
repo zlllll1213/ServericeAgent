@@ -122,7 +122,7 @@ make docker-down
 ## 快速启动（无需 Qdrant）
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -162,7 +162,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login \
 启动 Qdrant：
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 docker compose up -d qdrant
 ```
 
@@ -369,7 +369,7 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 ## 自动化测试
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 make test
 make coverage
 ```
@@ -379,7 +379,7 @@ make coverage
 ## Agent 评测集
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 make eval
 python evals/run_eval.py --dataset intent
 python evals/run_eval.py --dataset rag
@@ -398,7 +398,7 @@ python evals/run_eval.py --dataset e2e
 先启动服务，再执行：
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 python scripts/load_test.py --users 10 --requests 100
 ```
 

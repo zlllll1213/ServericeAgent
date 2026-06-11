@@ -15,7 +15,7 @@ venv/
 .ruff_cache/
 
 # Generated local reports
-serviceflow-agent-demo/reports/*.md
+serviceflow-agent-console/reports/*.md
 
 # Local agent and reasoning-tool configuration
 .codegraph/

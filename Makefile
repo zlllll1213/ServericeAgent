@@ -1,25 +1,25 @@
 .PHONY: dev test eval lint format coverage docker-up docker-down
 
 dev:
-	$(MAKE) -C serviceflow-agent-demo dev
+	$(MAKE) -C serviceflow-agent-console dev
 
 test:
-	$(MAKE) -C serviceflow-agent-demo test
+	$(MAKE) -C serviceflow-agent-console test
 
 eval:
-	$(MAKE) -C serviceflow-agent-demo eval
+	$(MAKE) -C serviceflow-agent-console eval
 
 lint:
-	$(MAKE) -C serviceflow-agent-demo lint
+	$(MAKE) -C serviceflow-agent-console lint
 
 format:
-	$(MAKE) -C serviceflow-agent-demo format
+	$(MAKE) -C serviceflow-agent-console format
 
 coverage:
-	$(MAKE) -C serviceflow-agent-demo coverage
+	$(MAKE) -C serviceflow-agent-console coverage
 
 docker-up:
-	$(MAKE) -C serviceflow-agent-demo docker-up
+	$(MAKE) -C serviceflow-agent-console docker-up
 
 docker-down:
-	$(MAKE) -C serviceflow-agent-demo docker-down
+	$(MAKE) -C serviceflow-agent-console docker-down

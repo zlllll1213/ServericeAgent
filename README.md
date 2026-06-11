@@ -2,7 +2,7 @@
 
 ServiceFlow Agent Console 是一个本地可运行的企业级客服 Agent 控制台。它面向电商和数码产品售后场景，把意图识别、工作流路由、业务工具、知识库检索、人工接管和质检证据放在同一套可审阅界面里。
 
-项目代码位于 [`serviceflow-agent-demo`](./serviceflow-agent-demo) 目录。目录名仍保留历史命名，产品展示名统一为 **ServiceFlow Agent Console**。
+项目代码位于 [`serviceflow-agent-console`](./serviceflow-agent-console) 目录。目录名仍保留历史命名，产品展示名统一为 **ServiceFlow Agent Console**。
 
 ## 产品定位
 
@@ -30,7 +30,7 @@ ServiceFlow Agent Console 是一个本地可运行的企业级客服 Agent 控�
 - 评测集覆盖 `intent`、`rag`、`tool`、`e2e` 四类样本，报告写入 `reports/eval_report_日期.md`。
 - 压测脚本 `python scripts/load_test.py --users 20 --requests 200` 会生成压测报告。
 - GitHub Actions 执行 lint、pytest 和轻量评测。
-- 工程文档位于 `serviceflow-agent-demo/docs/`。
+- 工程文档位于 `serviceflow-agent-console/docs/`。
 
 ## 角色说明
 
@@ -124,7 +124,7 @@ make docker-down
 ## 快速启动（无需 Qdrant）
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -164,7 +164,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login \
 启动 Qdrant：
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 docker compose up -d qdrant
 ```
 
@@ -371,7 +371,7 @@ curl -X POST http://127.0.0.1:8000/api/chat \
 ## 自动化测试
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 make test
 make coverage
 ```
@@ -381,7 +381,7 @@ make coverage
 ## Agent 评测集
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 make eval
 python evals/run_eval.py --dataset intent
 python evals/run_eval.py --dataset rag
@@ -400,7 +400,7 @@ python evals/run_eval.py --dataset e2e
 先启动服务，再执行：
 
 ```bash
-cd serviceflow-agent-demo
+cd serviceflow-agent-console
 python scripts/load_test.py --users 10 --requests 100
 ```
 

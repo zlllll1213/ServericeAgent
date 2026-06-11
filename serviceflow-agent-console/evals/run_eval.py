@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 # 评测会大量写入会话、日志和 trace；默认使用临时库，避免 make eval 污染已跟踪的演示 SQLite。
-EVAL_DB_PATH = Path(tempfile.gettempdir()) / "serviceflow-agent-demo-eval.db"
+EVAL_DB_PATH = Path(tempfile.gettempdir()) / "serviceflow-agent-console-eval.db"
 os.environ.setdefault("SERVICEFLOW_DB_PATH", str(EVAL_DB_PATH))
 
 from fastapi.testclient import TestClient  # noqa: E402

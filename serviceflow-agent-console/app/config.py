@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     qdrant_enabled: bool = Field(default=True, alias="QDRANT_ENABLED")
     qdrant_timeout_seconds: float = Field(default=3.0, alias="QDRANT_TIMEOUT_SECONDS")
     auth_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32), alias="AUTH_SECRET")
-    auth_issuer: str = Field(default="serviceflow-agent-demo", alias="AUTH_ISSUER")
+    auth_issuer: str = Field(default="serviceflow-agent-console", alias="AUTH_ISSUER")
     auth_audience: str = Field(default="serviceflow-admin", alias="AUTH_AUDIENCE")
     auth_token_ttl_seconds: int = Field(default=3600, alias="AUTH_TOKEN_TTL_SECONDS")
     demo_auth_enabled: bool = Field(default=False, alias="DEMO_AUTH_ENABLED")
