@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: serviceflow-agent-demo
+        working-directory: serviceflow-agent-console
     services:
       qdrant:
         image: qdrant/qdrant:v1.12.4
@@ -22,8 +22,8 @@ jobs:
           python-version: "3.11"
           cache: "pip"
           cache-dependency-path: |
-            serviceflow-agent-demo/requirements.txt
-            serviceflow-agent-demo/requirements-dev.txt
+            serviceflow-agent-console/requirements.txt
+            serviceflow-agent-console/requirements-dev.txt
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -41,4 +41,4 @@ jobs:
         if: always()
         with:
           name: serviceflow-reports
-          path: serviceflow-agent-demo/reports
+          path: serviceflow-agent-console/reports
