@@ -6,7 +6,7 @@
 - 将 `X-User-Role` 限定为 `DEMO_AUTH_ENABLED=true` 时的本地演示 fallback。
 - 将后台密码校验改为 PBKDF2 hash 校验。
 - 将 token 改为 HS256 JWT 结构，补充 `iss`、`aud`、`iat`、`exp`、`jti` 字段。
-- 将 `AUTH_SECRET` 改为环境变量或进程随机值，避免代码里固定 secret。
+- 将 `AUTH_SECRET` 改为环境变量稳定强随机值，缺失或过短时拒绝签发 token，避免进程随机 secret 导致重启后 token 全部失效。
 - 后台前端改为先登录获取 token，再用 `Authorization: Bearer` 调用后台接口。
 - 为 `/api/chat` 增加单进程滑动窗口限流。
 - 限流 identity 支持 `X-Forwarded-For`、`X-Real-IP` 和直连 IP。
@@ -93,8 +93,20 @@
 
 ## 仍待后续优化
 
-- 将数据库 session 逐步统一为 request-level dependency 或 service-level unit of work。
+- 将后台子路由、工具函数和 Agent persistence 继续收敛到 request-level dependency 或 service-level unit of work。
 - 将意图字符串抽象为 `StrEnum`。
 - 为 Agent nodes、persistence、tools 扩展结构化日志。
 - 增加应用 Dockerfile。
 - 将前端 JS/CSS 逐步模块化。
+
+## 2026-06-11 安全复核优化
+
+- `/api/orders/{order_id}` 保持 ORM 参数绑定查询，并新增“疑似注入字符串只按普通订单号处理”的回归测试。
+- `main.py` 中健康检查、订单、工单和退货列表接口改为使用 `Depends(get_db)` 注入数据库会话。
+- `auth.py` 登录查询改为使用 `Depends(get_db)` 注入数据库会话，不再直接实例化 `SessionLocal()`。
+- 后台管理子路由统一使用 `Depends(get_db)`，request 路由层不再直接创建数据库 session。
+- 移除认证模块内置 demo 密码哈希；seed 阶段按演示密码运行时加盐生成 PBKDF2 hash。
+- `traced_node` 重试等待时间改为 `AGENT_NODE_RETRY_DELAY_SECONDS` 配置项。
+- `parse_input_node` 不再清空上一轮 tool calls、retrieved docs、citations、evaluation 和关键业务结果，避免多轮证据丢失。
+- LLM Client 增加 `LLM_RETRY_ATTEMPTS` 和 `LLM_RETRY_DELAY_SECONDS`，对超时、网络错误、429 和 5xx 做短重试。
+- 补充安全与韧性回归测试，覆盖认证密钥、demo hash fallback、输入解析证据保留、节点重试延迟和 LLM transient retry。

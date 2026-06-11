@@ -27,6 +27,7 @@ from app.agent.nodes import (
     tool_execute_node,
 )
 from app.agent.state import AgentState
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 RETRYABLE_NODES = {"load_conversation_node", "save_conversation_node"}
@@ -91,7 +92,7 @@ def traced_node(node_name: str, fn):
                     error_message=str(exc),
                 )
                 if attempt + 1 < max_attempts:
-                    sleep(0.05)
+                    sleep(settings.agent_node_retry_delay_seconds)
                     continue
                 recovered = _recover_node_error(node_name, state, exc)
                 if recovered is not None:

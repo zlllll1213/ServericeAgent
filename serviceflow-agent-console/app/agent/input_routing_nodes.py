@@ -58,16 +58,16 @@ def parse_input_node(state: AgentState) -> AgentState:
         "extracted_slots": extracted_slots,
         "confirm_decision": confirm_decision,
         "route_trace": _trace(state, "parse_input_node"),
-        "tool_calls": [],
-        "retrieved_docs": [],
-        "citations": [],
-        "evaluation_result": {},
+        "tool_calls": state.get("tool_calls", []),
+        "retrieved_docs": state.get("retrieved_docs", []),
+        "citations": state.get("citations", []),
+        "evaluation_result": state.get("evaluation_result", {}),
         "missing_slots": [],
         "awaiting_user_input": False,
         "need_human": False,
-        "ticket_id": None,
-        "order_info": None,
-        "return_result": None,
+        "ticket_id": state.get("ticket_id"),
+        "order_info": state.get("order_info"),
+        "return_result": state.get("return_result"),
         "final_answer": "",
     }
 
@@ -138,4 +138,3 @@ def route_decision(state: AgentState) -> str:
         "HUMAN_TRANSFER": "human_ticket_node",
         "UNKNOWN": "clarify_node",
     }.get(state.get("intent", "UNKNOWN"), "clarify_node")
-

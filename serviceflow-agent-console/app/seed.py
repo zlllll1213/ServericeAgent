@@ -5,13 +5,11 @@ import sys
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.database import Base, SessionLocal, engine
 from app.config import KNOWLEDGE_BASE_DIR, settings
+from app.auth import hash_password
+from app.database import Base, SessionLocal, engine
 from app.migrations import ensure_schema_updates
 from app.models import AdminUser, AgentFeedback, AgentTrace, ChatLog, Conversation, KnowledgeDocument, Order, ReturnRequest, Ticket
-
-DEMO_ADMIN_PASSWORD_HASH = "pbkdf2_sha256$120000$serviceflow-admin-salt$9832057a930d7a670efdbaf1dde200756c0939784f2f496104189bcdabbe5e91"
-DEMO_AGENT_PASSWORD_HASH = "pbkdf2_sha256$120000$serviceflow-agent-salt$5bcc3a94b739763d9ab67aa08fd2bfc5c8e5aad24cacb6be499b3f9ecca6a28f"
 
 
 def seed_database(reset: bool = False) -> None:
@@ -87,9 +85,9 @@ def seed_database(reset: bool = False) -> None:
 
 def seed_admin_users(db) -> None:
     now = datetime.now()
-    # seed 脚本只服务本地演示数据；默认写入 demo hash，保证登录页提示的 admin/admin 可直接使用。
-    admin_hash = settings.admin_password_hash or DEMO_ADMIN_PASSWORD_HASH
-    agent_hash = settings.agent_password_hash or DEMO_AGENT_PASSWORD_HASH
+    # seed 脚本只服务本地演示数据；演示密码在运行时加盐生成，避免源码暴露可复用哈希。
+    admin_hash = settings.admin_password_hash or hash_password("admin")
+    agent_hash = settings.agent_password_hash or hash_password("agent")
     existing = {user.user_id: user for user in db.query(AdminUser).all()}
     users = []
     if "A1001" not in existing:

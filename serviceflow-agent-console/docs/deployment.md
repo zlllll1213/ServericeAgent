@@ -27,7 +27,7 @@ QDRANT_URL=http://127.0.0.1:6333
 QDRANT_COLLECTION=serviceflow_knowledge
 QDRANT_ENABLED=true
 QDRANT_TIMEOUT_SECONDS=3.0
-AUTH_SECRET=please-change-this-secret-in-real-environments
+AUTH_SECRET=replace-with-a-stable-random-secret-at-least-32-chars
 DEMO_AUTH_ENABLED=false
 ADMIN_PASSWORD_HASH=
 AGENT_PASSWORD_HASH=
@@ -36,11 +36,16 @@ RATE_LIMIT_BACKEND=memory
 CHAT_RATE_LIMIT_ENABLED=true
 CHAT_RATE_LIMIT_REQUESTS=60
 CHAT_RATE_LIMIT_WINDOW_SECONDS=60
+AGENT_NODE_RETRY_DELAY_SECONDS=0.05
+LLM_RETRY_ATTEMPTS=2
+LLM_RETRY_DELAY_SECONDS=0.2
 ```
 
-CI 和测试不依赖真实 OpenAI API Key。`AUTH_SECRET` 在生产或公网环境必须替换为强随机值；`DEMO_AUTH_ENABLED` 只用于本地演示，不能在生产开启。生产环境需要从环境变量或密钥管理系统提供 `ADMIN_PASSWORD_HASH` 和 `AGENT_PASSWORD_HASH`。
+CI 和测试不依赖真实 OpenAI API Key。`AUTH_SECRET` 必须由环境变量或密钥管理系统提供稳定强随机值；缺失或过短时系统会拒绝签发 token，避免重启后 token 因进程随机 secret 全部失效。`DEMO_AUTH_ENABLED` 只用于本地演示，不能在生产开启。生产环境需要从环境变量或密钥管理系统提供 `ADMIN_PASSWORD_HASH` 和 `AGENT_PASSWORD_HASH`。
 
 当前内存限流只适合单进程 Demo。多 worker 或多实例部署时应设置 `RATE_LIMIT_BACKEND=redis` 并配置 `REDIS_URL`，系统会使用 Redis `INCR` + `EXPIRE` 做跨进程统一计数。
+
+SQLite 仅适合作为本地演示数据库。生产环境如有并发写入、审计追踪和多实例部署需求，应迁移到 PostgreSQL，并把业务工具层替换为真实 ERP/售后系统或独立服务。
 
 ## 压测
 

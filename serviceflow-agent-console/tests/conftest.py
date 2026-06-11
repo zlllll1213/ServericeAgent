@@ -5,6 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("SERVICEFLOW_DB_PATH", os.path.join(tempfile.gettempdir(), "serviceflow-agent-console-test.db"))
+os.environ.setdefault("AUTH_SECRET", "test-auth-secret-with-at-least-32-characters")
 os.environ.setdefault("DEMO_AUTH_ENABLED", "false")
 os.environ.setdefault("ADMIN_PASSWORD_HASH", "pbkdf2_sha256$120000$serviceflow-admin-salt$9832057a930d7a670efdbaf1dde200756c0939784f2f496104189bcdabbe5e91")
 os.environ.setdefault("AGENT_PASSWORD_HASH", "pbkdf2_sha256$120000$serviceflow-agent-salt$5bcc3a94b739763d9ab67aa08fd2bfc5c8e5aad24cacb6be499b3f9ecca6a28f")

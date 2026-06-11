@@ -147,7 +147,7 @@ service_agent / agent
 
 这个模式不要求 Qdrant 已启动。后端会优先尝试 Qdrant，如果连接失败，会自动使用 `SimpleRetriever`，方便快速启动和离线验证。
 
-后台 API 默认使用 Bearer token。登录页会调用 `POST /api/auth/login` 并保存会话 token；`X-User-Role` 只在显式设置 `DEMO_AUTH_ENABLED=true` 的本地演示模式下生效，不应作为生产认证方式。
+后台 API 默认使用 Bearer token。登录页会调用 `POST /api/auth/login` 并保存会话 token；`AUTH_SECRET` 必须配置为稳定且至少 32 字符的随机密钥，否则系统会拒绝签发 token。`X-User-Role` 只在显式设置 `DEMO_AUTH_ENABLED=true` 的本地演示模式下生效，不应作为生产认证方式。
 
 命令行登录示例：
 
@@ -203,6 +203,8 @@ QDRANT_ENABLED=true
 OPENAI_API_KEY=
 OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4.1-mini
+LLM_RETRY_ATTEMPTS=2
+LLM_RETRY_DELAY_SECONDS=0.2
 ```
 
 如果 `OPENAI_API_KEY` 为空，系统会自动进入 fallback 模式：
@@ -374,7 +376,7 @@ make test
 make coverage
 ```
 
-测试目录按能力拆分：认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和 tenant 契约。当前仓库仍是 SQLite 单体控制台，完整 PostgreSQL/Redis/MinIO/多租户强隔离测试在本阶段以契约或 skip 标注保留入口。
+测试目录按能力拆分：认证、健康检查、Agent 业务闭环、人工接管、工具函数、Retriever、Trace、RBAC 和 tenant 契约。当前仓库仍是 SQLite 单体控制台，SQLite 只适合本地演示；生产并发写入建议迁移到 PostgreSQL。完整 PostgreSQL/Redis/MinIO/多租户强隔离测试在本阶段以契约或 skip 标注保留入口。
 
 ## Agent 评测集
 

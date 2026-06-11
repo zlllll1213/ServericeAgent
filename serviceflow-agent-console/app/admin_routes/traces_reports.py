@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
 from app.admin_routes.common import REPORTS_DIR, PROJECT_ROOT, not_found
 from app.agent.persistence import decode_json
-from app.database import SessionLocal
+from app.database import get_db
 from app.models import AgentTrace
 
 router = APIRouter()
@@ -21,34 +22,33 @@ def list_agent_traces(
     success: bool | None = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=50, ge=1, le=200),
+    db: Session = Depends(get_db),
 ):
-    with SessionLocal() as db:
-        query = db.query(AgentTrace)
-        if conversation_id:
-            query = query.filter(AgentTrace.conversation_id == conversation_id)
-        if trace_id:
-            query = query.filter(AgentTrace.trace_id == trace_id)
-        if node_name:
-            query = query.filter(AgentTrace.node_name == node_name)
-        if success is not None:
-            query = query.filter(AgentTrace.success == success)
-        rows = query.order_by(AgentTrace.id.desc()).offset((page - 1) * page_size).limit(page_size).all()
-        return [trace.to_dict() for trace in rows]
+    query = db.query(AgentTrace)
+    if conversation_id:
+        query = query.filter(AgentTrace.conversation_id == conversation_id)
+    if trace_id:
+        query = query.filter(AgentTrace.trace_id == trace_id)
+    if node_name:
+        query = query.filter(AgentTrace.node_name == node_name)
+    if success is not None:
+        query = query.filter(AgentTrace.success == success)
+    rows = query.order_by(AgentTrace.id.desc()).offset((page - 1) * page_size).limit(page_size).all()
+    return [trace.to_dict() for trace in rows]
 
 
 @router.get("/admin/traces/{trace_id}")
-def get_agent_trace_chain(trace_id: str):
-    with SessionLocal() as db:
-        rows = db.query(AgentTrace).filter(AgentTrace.trace_id == trace_id).order_by(AgentTrace.id.asc()).all()
-        if not rows:
-            not_found("Trace")
-        items = []
-        for row in rows:
-            data = row.to_dict()
-            data["input_state"] = decode_json(row.input_state, {})
-            data["output_state"] = decode_json(row.output_state, {})
-            items.append(data)
-        return {"trace_id": trace_id, "nodes": items}
+def get_agent_trace_chain(trace_id: str, db: Session = Depends(get_db)):
+    rows = db.query(AgentTrace).filter(AgentTrace.trace_id == trace_id).order_by(AgentTrace.id.asc()).all()
+    if not rows:
+        not_found("Trace")
+    items = []
+    for row in rows:
+        data = row.to_dict()
+        data["input_state"] = decode_json(row.input_state, {})
+        data["output_state"] = decode_json(row.output_state, {})
+        items.append(data)
+    return {"trace_id": trace_id, "nodes": items}
 
 
 @router.get("/admin/evaluation-reports")

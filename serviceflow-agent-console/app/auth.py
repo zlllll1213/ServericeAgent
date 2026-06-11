@@ -4,23 +4,24 @@ import base64
 import hashlib
 import hmac
 import json
+import secrets
 import time
 from typing import Any
 from uuid import uuid4
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.core.exceptions import AuthException, PermissionDeniedException, ServiceFlowException
-from app.database import SessionLocal
+from app.database import get_db
 from app.models import AdminUser
 
 router = APIRouter()
 
 JWT_HEADER = {"alg": "HS256", "typ": "JWT"}
-DEMO_ADMIN_PASSWORD_HASH = "pbkdf2_sha256$120000$serviceflow-admin-salt$9832057a930d7a670efdbaf1dde200756c0939784f2f496104189bcdabbe5e91"
-DEMO_AGENT_PASSWORD_HASH = "pbkdf2_sha256$120000$serviceflow-agent-salt$5bcc3a94b739763d9ab67aa08fd2bfc5c8e5aad24cacb6be499b3f9ecca6a28f"
+PASSWORD_HASH_ITERATIONS = 120000
 
 
 class LoginRequest(BaseModel):
@@ -37,8 +38,22 @@ def _base64url_decode(value: str) -> bytes:
     return base64.urlsafe_b64decode(f"{value}{padding}".encode())
 
 
+def _auth_secret() -> str:
+    if not settings.auth_secret:
+        raise AuthException("AUTH_SECRET 未配置，请使用稳定的强随机密钥，避免服务重启后 token 全部失效")
+    if len(settings.auth_secret) < 32:
+        raise AuthException("AUTH_SECRET 长度不足，请至少使用 32 个字符")
+    return settings.auth_secret
+
+
 def _sign(message: str) -> str:
-    return _base64url_encode(hmac.new(settings.auth_secret.encode(), message.encode(), hashlib.sha256).digest())
+    return _base64url_encode(hmac.new(_auth_secret().encode(), message.encode(), hashlib.sha256).digest())
+
+
+def hash_password(password: str, salt: str | None = None, iterations: int = PASSWORD_HASH_ITERATIONS) -> str:
+    resolved_salt = salt or secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), resolved_salt.encode(), iterations).hex()
+    return f"pbkdf2_sha256${iterations}${resolved_salt}${digest}"
 
 
 def _password_hash_matches(password: str, password_hash: str) -> bool:
@@ -55,8 +70,8 @@ def _password_hash_matches(password: str, password_hash: str) -> bool:
 
 
 def _configured_users() -> dict[str, dict[str, str]]:
-    admin_hash = settings.admin_password_hash or (DEMO_ADMIN_PASSWORD_HASH if settings.demo_auth_enabled else None)
-    agent_hash = settings.agent_password_hash or (DEMO_AGENT_PASSWORD_HASH if settings.demo_auth_enabled else None)
+    admin_hash = settings.admin_password_hash
+    agent_hash = settings.agent_password_hash
     if not admin_hash or not agent_hash:
         raise AuthException("后台密码哈希未配置，请设置 ADMIN_PASSWORD_HASH 和 AGENT_PASSWORD_HASH")
     return {
@@ -65,15 +80,11 @@ def _configured_users() -> dict[str, dict[str, str]]:
     }
 
 
-def _admin_user_from_db(username: str) -> dict[str, str] | None:
-    db = SessionLocal()
-    try:
-        admin_user = db.query(AdminUser).filter(AdminUser.username == username).first()
-        if admin_user is None:
-            return None
-        return {"user_id": admin_user.user_id, "role": admin_user.role, "password_hash": admin_user.password_hash or ""}
-    finally:
-        db.close()
+def _admin_user_from_db(username: str, db: Session) -> dict[str, str] | None:
+    admin_user = db.query(AdminUser).filter(AdminUser.username == username).first()
+    if admin_user is None:
+        return None
+    return {"user_id": admin_user.user_id, "role": admin_user.role, "password_hash": admin_user.password_hash or ""}
 
 
 def create_token(payload: dict[str, Any], ttl_seconds: int = 3600) -> str:
@@ -134,8 +145,8 @@ def require_admin_access(
 
 
 @router.post("/auth/login")
-def login(request: LoginRequest):
-    user = _admin_user_from_db(request.username) or _configured_users().get(request.username)
+def login(request: LoginRequest, db: Session = Depends(get_db)):
+    user = _admin_user_from_db(request.username, db) or _configured_users().get(request.username)
     if not user or not user.get("password_hash") or not _password_hash_matches(request.password, user["password_hash"]):
         raise AuthException("账号或密码错误")
     token = create_token(

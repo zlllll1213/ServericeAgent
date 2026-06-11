@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from time import sleep
 from typing import Any
 
 import httpx
@@ -18,11 +19,15 @@ class LLMClient:
         base_url: str | None = None,
         model: str | None = None,
         timeout: float = 12.0,
+        retry_attempts: int | None = None,
+        retry_delay_seconds: float | None = None,
     ):
         self.api_key = api_key if api_key is not None else settings.openai_api_key
         self.base_url = (base_url or settings.openai_base_url).rstrip("/")
         self.model = model or settings.openai_model
         self.timeout = timeout
+        self.retry_attempts = max(1, retry_attempts if retry_attempts is not None else settings.llm_retry_attempts)
+        self.retry_delay_seconds = retry_delay_seconds if retry_delay_seconds is not None else settings.llm_retry_delay_seconds
         self.last_error: str | None = None
 
     @property
@@ -43,33 +48,39 @@ class LLMClient:
         if json_output:
             payload["response_format"] = {"type": "json_object"}
 
-        try:
-            # 使用 OpenAI-compatible Chat Completions 协议，base_url 可指向第三方兼容服务。
-            response = httpx.post(
-                f"{self.base_url}/chat/completions",
-                headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
-                json=payload,
-                timeout=self.timeout,
-            )
-            response.raise_for_status()
-            body = response.json()
-            return body["choices"][0]["message"]["content"]
-        except httpx.HTTPStatusError as exc:
-            self.last_error = f"LLM HTTP {exc.response.status_code}"
-            logger.warning("llm_http_status_error status=%s model=%s", exc.response.status_code, self.model)
-            return None
-        except httpx.TimeoutException:
-            self.last_error = "LLM 请求超时"
-            logger.warning("llm_timeout model=%s timeout=%s", self.model, self.timeout)
-            return None
-        except httpx.HTTPError as exc:
-            self.last_error = exc.__class__.__name__
-            logger.warning("llm_http_error type=%s model=%s", exc.__class__.__name__, self.model)
-            return None
-        except (KeyError, IndexError, TypeError, ValueError) as exc:
-            self.last_error = "LLM 响应结构异常"
-            logger.warning("llm_response_parse_error type=%s model=%s", exc.__class__.__name__, self.model)
-            return None
+        for attempt in range(self.retry_attempts):
+            try:
+                # 使用 OpenAI-compatible Chat Completions 协议，base_url 可指向第三方兼容服务。
+                response = httpx.post(
+                    f"{self.base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+                    json=payload,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                body = response.json()
+                return body["choices"][0]["message"]["content"]
+            except httpx.HTTPStatusError as exc:
+                self.last_error = f"LLM HTTP {exc.response.status_code}"
+                logger.warning("llm_http_status_error status=%s model=%s attempt=%s", exc.response.status_code, self.model, attempt + 1)
+                if not _should_retry_status(exc.response.status_code) or attempt + 1 >= self.retry_attempts:
+                    return None
+            except httpx.TimeoutException:
+                self.last_error = "LLM 请求超时"
+                logger.warning("llm_timeout model=%s timeout=%s attempt=%s", self.model, self.timeout, attempt + 1)
+                if attempt + 1 >= self.retry_attempts:
+                    return None
+            except httpx.HTTPError as exc:
+                self.last_error = exc.__class__.__name__
+                logger.warning("llm_http_error type=%s model=%s attempt=%s", exc.__class__.__name__, self.model, attempt + 1)
+                if attempt + 1 >= self.retry_attempts:
+                    return None
+            except (KeyError, IndexError, TypeError, ValueError) as exc:
+                self.last_error = "LLM 响应结构异常"
+                logger.warning("llm_response_parse_error type=%s model=%s", exc.__class__.__name__, self.model)
+                return None
+            sleep(self.retry_delay_seconds)
+        return None
 
     def json_completion(self, prompt: str) -> dict[str, Any] | None:
         content = self.chat_completion(
@@ -92,3 +103,7 @@ class LLMClient:
 
 def get_llm_client() -> LLMClient:
     return LLMClient()
+
+
+def _should_retry_status(status_code: int) -> bool:
+    return status_code == 429 or status_code >= 500

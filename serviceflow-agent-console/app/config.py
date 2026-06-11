@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import secrets
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -22,7 +21,7 @@ class Settings(BaseSettings):
     qdrant_vector_size: int = Field(default=384, alias="QDRANT_VECTOR_SIZE")
     qdrant_enabled: bool = Field(default=True, alias="QDRANT_ENABLED")
     qdrant_timeout_seconds: float = Field(default=3.0, alias="QDRANT_TIMEOUT_SECONDS")
-    auth_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32), alias="AUTH_SECRET")
+    auth_secret: str | None = Field(default=None, alias="AUTH_SECRET")
     auth_issuer: str = Field(default="serviceflow-agent-console", alias="AUTH_ISSUER")
     auth_audience: str = Field(default="serviceflow-admin", alias="AUTH_AUDIENCE")
     auth_token_ttl_seconds: int = Field(default=3600, alias="AUTH_TOKEN_TTL_SECONDS")
@@ -39,6 +38,9 @@ class Settings(BaseSettings):
     clarify_confidence_threshold: float = Field(default=0.45, alias="CLARIFY_CONFIDENCE_THRESHOLD")
     intent_conflict_high_confidence_threshold: float = Field(default=0.7, alias="INTENT_CONFLICT_HIGH_CONFIDENCE_THRESHOLD")
     intent_conflict_confidence_gap: float = Field(default=0.12, alias="INTENT_CONFLICT_CONFIDENCE_GAP")
+    agent_node_retry_delay_seconds: float = Field(default=0.05, alias="AGENT_NODE_RETRY_DELAY_SECONDS")
+    llm_retry_attempts: int = Field(default=2, alias="LLM_RETRY_ATTEMPTS")
+    llm_retry_delay_seconds: float = Field(default=0.2, alias="LLM_RETRY_DELAY_SECONDS")
 
     model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env", extra="ignore", populate_by_name=True)
 

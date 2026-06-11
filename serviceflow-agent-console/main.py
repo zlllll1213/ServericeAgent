@@ -1,10 +1,11 @@
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.admin import router as admin_router
@@ -14,7 +15,7 @@ from app.auth import router as auth_router
 from app.auth import user_from_headers
 from app.core.exceptions import AuthException, PermissionDeniedException, ServiceFlowException, generic_exception_handler, serviceflow_exception_handler
 from app.config import settings
-from app.database import Base, SessionLocal, engine
+from app.database import Base, engine, get_db
 from app.migrations import ensure_schema_updates
 from app.models import Order, ReturnRequest, Ticket
 from app.rate_limit import check_chat_rate_limit, client_identity_from_request
@@ -61,9 +62,8 @@ def login_page():
 
 
 @app.get("/api/health")
-def health():
-    with SessionLocal() as db:
-        db.execute(text("select 1"))
+def health(db: Session = Depends(get_db)):
+    db.execute(text("select 1"))
     return {
         "status": "ok",
         "database": "ok",
@@ -109,24 +109,21 @@ def reset_conversation_state(conversation_id: str):
 
 
 @app.get("/api/orders/{order_id}", response_model=OrderResponse)
-def get_order(order_id: str):
-    with SessionLocal() as db:
-        # 这个接口用于演示业务数据库直查，不经过 Agent 工作流。
-        order = db.query(Order).filter(Order.order_id == order_id).first()
-        if order is None:
-            return {"error": "订单不存在", "order_id": order_id}
-        return order.to_dict()
+def get_order(order_id: str, db: Session = Depends(get_db)):
+    # 这个接口用于演示业务数据库直查，不经过 Agent 工作流；ORM 条件会把 order_id 当作参数值绑定。
+    order = db.query(Order).filter(Order.order_id == order_id).first()
+    if order is None:
+        return {"error": "订单不存在", "order_id": order_id}
+    return order.to_dict()
 
 
 @app.get("/api/tickets", response_model=list[TicketResponse])
-def list_tickets():
-    with SessionLocal() as db:
-        tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
-        return [ticket.to_dict() for ticket in tickets]
+def list_tickets(db: Session = Depends(get_db)):
+    tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
+    return [ticket.to_dict() for ticket in tickets]
 
 
 @app.get("/api/returns", response_model=list[ReturnResponse])
-def list_returns():
-    with SessionLocal() as db:
-        returns = db.query(ReturnRequest).order_by(ReturnRequest.id.desc()).all()
-        return [item.to_dict() for item in returns]
+def list_returns(db: Session = Depends(get_db)):
+    returns = db.query(ReturnRequest).order_by(ReturnRequest.id.desc()).all()
+    return [item.to_dict() for item in returns]
